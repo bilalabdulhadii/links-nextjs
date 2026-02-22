@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { AppConfig } from "@/lib/app-config";
 import { HomeView } from "@/components/home/home-view";
 import { HomeFooter } from "@/components/home/home-footer";
@@ -38,7 +38,7 @@ function DeviceFrame({
                 config={config}
                 fullHeight={false}
                 rootClassName="h-full min-h-0"
-                mainClassName="h-full min-h-0 py-8"
+                mainClassName="h-full min-h-0 py-8 overflow-y-auto overscroll-contain"
                 footer={<HomeFooter />}
             />
         </div>
@@ -52,9 +52,58 @@ export function PreviewPanel({
     className?: string;
 }) {
     const [view, setView] = useState<DeviceKey>("phone");
+    const [boardSize, setBoardSize] = useState({ width: 0, height: 0 });
+    const boardRef = useRef<HTMLDivElement>(null);
     const isAll = view === "all";
     const active =
         devicePresets.find((item) => item.key === view) ?? devicePresets[0];
+
+    useEffect(() => {
+        if (!boardRef.current) {
+            return;
+        }
+
+        const observer = new ResizeObserver((entries) => {
+            for (const entry of entries) {
+                const { width, height } = entry.contentRect;
+                setBoardSize({ width, height });
+            }
+        });
+
+        observer.observe(boardRef.current);
+        return () => observer.disconnect();
+    }, []);
+
+    const boardPadding = 20;
+    const deviceGap = 24;
+    const labelHeight = 20;
+    const labelGap = 12;
+    const baseWidth = isAll
+        ? devicePresets.reduce(
+              (sum, device) => sum + device.width,
+              0,
+          ) +
+          deviceGap * Math.max(0, devicePresets.length - 1)
+        : active.width;
+    const baseHeight = isAll
+        ? Math.max(
+              ...devicePresets.map(
+                  (device) => device.height + labelHeight + labelGap,
+              ),
+          )
+        : active.height;
+    const boardWidth = baseWidth + boardPadding * 2;
+    const boardHeight = baseHeight + boardPadding * 2;
+    const scale =
+        boardSize.width && boardSize.height
+            ? Math.min(
+                  1,
+                  boardSize.width / boardWidth,
+                  boardSize.height / boardHeight,
+              )
+            : 1;
+    const scaledWidth = boardWidth * scale;
+    const scaledHeight = boardHeight * scale;
 
     return (
         <Card className={cn("flex h-full flex-col", className)}>
@@ -102,41 +151,60 @@ export function PreviewPanel({
                                 : `${active.width}x${active.height}`}
                         </span>
                     </div>
-                    <div className="flex-1 min-h-0 overflow-hidden rounded-[28px] border border-border/60 bg-background shadow-sm">
-                        <div className="h-full w-full overflow-scroll [scrollbar-gutter:stable_both-edges]">
+                    <div
+                        ref={boardRef}
+                        className="flex-1 min-h-0 overflow-hidden rounded-[28px] border border-border/60 bg-background shadow-sm">
+                        <div className="flex h-full w-full items-center justify-center">
                             <div
-                                className={cn(
-                                    "min-h-full w-max mx-auto p-5 flex",
-                                    isAll
-                                        ? "items-start"
-                                        : "items-center justify-center",
-                                )}>
-                                {isAll ? (
-                                    <div className="flex items-start gap-6">
-                                        {devicePresets.map((device) => (
-                                            <div
-                                                key={device.key}
-                                                className="flex flex-col gap-3">
-                                                <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-                                                    <span>{device.label}</span>
-                                                    <span className="tabular-nums">
-                                                        {device.width}x
-                                                        {device.height}
-                                                    </span>
-                                                </div>
-                                                <DeviceFrame
-                                                    device={device}
-                                                    config={config}
-                                                />
+                                style={{
+                                    width: scaledWidth,
+                                    height: scaledHeight,
+                                }}>
+                                <div
+                                    className="h-full w-full"
+                                    style={{
+                                        width: boardWidth,
+                                        height: boardHeight,
+                                        transform: `scale(${scale})`,
+                                        transformOrigin: "top left",
+                                    }}>
+                                    <div
+                                        className={cn(
+                                            "h-full w-full p-5 flex",
+                                            isAll
+                                                ? "items-start"
+                                                : "items-center justify-center",
+                                        )}>
+                                        {isAll ? (
+                                            <div className="flex items-start gap-6">
+                                                {devicePresets.map((device) => (
+                                                    <div
+                                                        key={device.key}
+                                                        className="flex flex-col gap-3">
+                                                        <div className="flex h-5 items-center justify-between text-[11px] text-muted-foreground">
+                                                            <span>
+                                                                {device.label}
+                                                            </span>
+                                                            <span className="tabular-nums">
+                                                                {device.width}x
+                                                                {device.height}
+                                                            </span>
+                                                        </div>
+                                                        <DeviceFrame
+                                                            device={device}
+                                                            config={config}
+                                                        />
+                                                    </div>
+                                                ))}
                                             </div>
-                                        ))}
+                                        ) : (
+                                            <DeviceFrame
+                                                device={active}
+                                                config={config}
+                                            />
+                                        )}
                                     </div>
-                                ) : (
-                                    <DeviceFrame
-                                        device={active}
-                                        config={config}
-                                    />
-                                )}
+                                </div>
                             </div>
                         </div>
                     </div>
