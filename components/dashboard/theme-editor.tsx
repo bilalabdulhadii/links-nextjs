@@ -4,10 +4,17 @@ import { useState } from "react";
 import { StyleEditor } from "@/components/dashboard/style-editor";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ColorInput } from "@/components/ui/color-input";
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { defaultConfig, type AppConfig, type BackgroundConfig } from "@/lib/app-config";
 import type { UploadResult } from "@/lib/storage";
+import { ChevronDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const IMAGE_LIMIT_MB = 5;
 const VIDEO_LIMIT_MB = 30;
@@ -34,6 +41,9 @@ export function ThemeEditor({
     ) => Promise<UploadResult>;
 }) {
     const [error, setError] = useState<string | null>(null);
+    const [openSections, setOpenSections] = useState<string[]>(["background"]);
+    const [bgImageProgress, setBgImageProgress] = useState<number | null>(null);
+    const [bgVideoProgress, setBgVideoProgress] = useState<number | null>(null);
 
     const updateTheme = (theme: AppConfig["theme"]) => {
         onChange({ ...config, theme });
@@ -71,9 +81,13 @@ export function ThemeEditor({
             setError(`Image must be <= ${IMAGE_LIMIT_MB} MB.`);
             return;
         }
-        const result = await onUpload(file, "media/background");
+        setBgImageProgress(0);
+        const result = await onUpload(file, "media/background", (progress) => {
+            setBgImageProgress(progress);
+        });
         setError(null);
         updateBackground({ type: "image", url: result.url, path: result.path });
+        setTimeout(() => setBgImageProgress(null), 800);
     };
 
     const handleVideoUpload = async (file: File) => {
@@ -85,20 +99,22 @@ export function ThemeEditor({
             setError(`Video must be <= ${VIDEO_LIMIT_MB} MB.`);
             return;
         }
-        const result = await onUpload(file, "media/background");
+        setBgVideoProgress(0);
+        const result = await onUpload(file, "media/background", (progress) => {
+            setBgVideoProgress(progress);
+        });
         setError(null);
         updateBackground({ type: "video", url: result.url, path: result.path });
+        setTimeout(() => setBgVideoProgress(null), 800);
     };
 
     const background = config.theme.background;
-
-    return (
-        <div id="theme" className="grid gap-6">
-            <Card>
-                <CardHeader>
-                    <CardTitle>Background</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
+    const sections = [
+        {
+            id: "background",
+            title: "Background",
+            content: (
+                <CardContent className="space-y-4 pt-0">
                     <div className="grid gap-2">
                         <Label>Type</Label>
                         <select
@@ -106,8 +122,7 @@ export function ThemeEditor({
                             value={background.type}
                             onChange={(event) =>
                                 handleBackgroundType(
-                                    event.target
-                                        .value as BackgroundConfig["type"],
+                                    event.target.value as BackgroundConfig["type"],
                                 )
                             }>
                             <option value="solid">Solid</option>
@@ -192,9 +207,7 @@ export function ThemeEditor({
                                         })
                                     }>
                                     {directions.map((direction) => (
-                                        <option
-                                            key={direction}
-                                            value={direction}>
+                                        <option key={direction} value={direction}>
                                             {direction}
                                         </option>
                                     ))}
@@ -216,6 +229,21 @@ export function ThemeEditor({
                                     }
                                 }}
                             />
+                            {bgImageProgress !== null ? (
+                                <div className="space-y-1">
+                                    <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                                        <div
+                                            className="h-full rounded-full bg-foreground transition-all"
+                                            style={{
+                                                width: `${bgImageProgress}%`,
+                                            }}
+                                        />
+                                    </div>
+                                    <p className="text-xs text-muted-foreground">
+                                        Uploading... {bgImageProgress}%
+                                    </p>
+                                </div>
+                            ) : null}
                             {background.url ? (
                                 // eslint-disable-next-line @next/next/no-img-element
                                 <img
@@ -240,6 +268,21 @@ export function ThemeEditor({
                                     }
                                 }}
                             />
+                            {bgVideoProgress !== null ? (
+                                <div className="space-y-1">
+                                    <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                                        <div
+                                            className="h-full rounded-full bg-foreground transition-all"
+                                            style={{
+                                                width: `${bgVideoProgress}%`,
+                                            }}
+                                        />
+                                    </div>
+                                    <p className="text-xs text-muted-foreground">
+                                        Uploading... {bgVideoProgress}%
+                                    </p>
+                                </div>
+                            ) : null}
                             {background.url ? (
                                 <video
                                     src={background.url}
@@ -255,13 +298,13 @@ export function ThemeEditor({
                         <p className="text-sm text-destructive">{error}</p>
                     ) : null}
                 </CardContent>
-            </Card>
-
-            <Card>
-                <CardHeader>
-                    <CardTitle>Icon Style</CardTitle>
-                </CardHeader>
-                <CardContent>
+            ),
+        },
+        {
+            id: "icon-style",
+            title: "Icon Style",
+            content: (
+                <CardContent className="pt-0">
                     <StyleEditor
                         style={config.theme.iconStyle}
                         onChange={(iconStyle) =>
@@ -269,13 +312,13 @@ export function ThemeEditor({
                         }
                     />
                 </CardContent>
-            </Card>
-
-            <Card>
-                <CardHeader>
-                    <CardTitle>Button Style</CardTitle>
-                </CardHeader>
-                <CardContent>
+            ),
+        },
+        {
+            id: "button-style",
+            title: "Button Style",
+            content: (
+                <CardContent className="pt-0">
                     <StyleEditor
                         style={config.theme.buttonStyle}
                         onChange={(buttonStyle) =>
@@ -283,13 +326,13 @@ export function ThemeEditor({
                         }
                     />
                 </CardContent>
-            </Card>
-
-            <Card>
-                <CardHeader>
-                    <CardTitle>Text Color</CardTitle>
-                </CardHeader>
-                <CardContent>
+            ),
+        },
+        {
+            id: "text-color",
+            title: "Text Color",
+            content: (
+                <CardContent className="pt-0">
                     <div className="grid gap-2">
                         <Label>Title, description, modal, footer</Label>
                         <ColorInput
@@ -304,13 +347,13 @@ export function ThemeEditor({
                         />
                     </div>
                 </CardContent>
-            </Card>
-
-            <Card>
-                <CardHeader>
-                    <CardTitle>Hover Animation</CardTitle>
-                </CardHeader>
-                <CardContent>
+            ),
+        },
+        {
+            id: "hover-animation",
+            title: "Hover Animation",
+            content: (
+                <CardContent className="pt-0">
                     <div className="grid gap-4">
                         <Label>Buttons, icons, share button</Label>
                         <select
@@ -341,14 +384,12 @@ export function ThemeEditor({
                                     const raw = event.target.value;
                                     const next =
                                         raw === ""
-                                            ? defaultConfig.theme
-                                                  .hoverTransitionMs
+                                            ? defaultConfig.theme.hoverTransitionMs
                                             : Number(raw);
                                     updateTheme({
                                         ...config.theme,
                                         hoverTransitionMs:
-                                            Number.isFinite(next) &&
-                                            next >= 0
+                                            Number.isFinite(next) && next >= 0
                                                 ? next
                                                 : defaultConfig.theme
                                                       .hoverTransitionMs,
@@ -362,7 +403,50 @@ export function ThemeEditor({
                         </div>
                     </div>
                 </CardContent>
-            </Card>
+            ),
+        },
+    ];
+
+    return (
+        <div id="theme" className="grid gap-6">
+            {sections.map((section) => {
+                const isOpen = openSections.includes(section.id);
+                return (
+                    <Collapsible
+                        key={section.id}
+                        open={isOpen}
+                        onOpenChange={(open) =>
+                            setOpenSections((prev) =>
+                                open
+                                    ? [...prev, section.id]
+                                    : prev.filter((id) => id !== section.id),
+                            )
+                        }>
+                        <Card>
+                            <CardHeader className="p-0">
+                                <CollapsibleTrigger asChild>
+                                    <button
+                                        type="button"
+                                        className="flex w-full items-center justify-between gap-4 px-6 py-4 text-left">
+                                        <CardTitle>{section.title}</CardTitle>
+                                        <ChevronDown
+                                            className={cn(
+                                                "h-4 w-4 text-muted-foreground transition-transform",
+                                                isOpen
+                                                    ? "rotate-180"
+                                                    : "rotate-0",
+                                            )}
+                                        />
+                                    </button>
+                                </CollapsibleTrigger>
+                            </CardHeader>
+                            <CollapsibleContent>
+                                {section.content}
+                            </CollapsibleContent>
+                        </Card>
+                    </Collapsible>
+                );
+            })}
         </div>
     );
 }
