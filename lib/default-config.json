@@ -12,7 +12,8 @@
     },
     "cover": {
         "type": "image",
-        "url": "/images/default-cover.svg"
+        "url": "/images/default-cover.svg",
+        "position": "center"
     },
     "theme": {
         "background": {
@@ -40,6 +41,11 @@
             "radius": 18,
             "textAlign": "center"
         },
+        "contentCard": {
+            "bgColor": "#88caf7",
+            "opacity": 12,
+            "blur": 16
+        },
         "textColor": "#0f172a",
         "hoverAnimation": "lift",
         "hoverTransitionMs": 260
@@ -65,24 +71,24 @@
         }
     ],
     "buttons": [
-    {
-      "id": "btn-store",
-      "layout": "card",
-      "eyebrow": "Featured",
-      "label": "Visit Store",
-      "url": "https://example.com",
-      "imageUrl": "/images/preview.jpg",
-      "useCustomStyle": true,
-      "customStyle": {
-        "borderColor": "#bae6fd",
-        "textColor": "#0f172a",
-        "bgColor": "#eff6ff",
-        "hoverBorderColor": "#7dd3fc",
-        "hoverTextColor": "#0f172a",
-        "hoverBgColor": "#e0f2fe",
-        "textAlign": "left"
-      }
-    },
+        {
+            "id": "btn-store",
+            "layout": "card",
+            "eyebrow": "Featured",
+            "label": "Visit Store",
+            "url": "https://example.com",
+            "imageUrl": "/images/preview.jpg",
+            "useCustomStyle": true,
+            "customStyle": {
+                "borderColor": "#bae6fd",
+                "textColor": "#0f172a",
+                "bgColor": "#eff6ff",
+                "hoverBorderColor": "#7dd3fc",
+                "hoverTextColor": "#0f172a",
+                "hoverBgColor": "#e0f2fe",
+                "textAlign": "left"
+            }
+        },
         {
             "id": "btn-newsletter",
             "layout": "icon-text",

@@ -50,6 +50,11 @@ export function ProfileEditor({
             : "to bottom";
     const defaultCoverImageUrl =
         defaultConfig.cover.type === "image" ? defaultConfig.cover.url : "";
+    const defaultCoverPosition =
+        defaultConfig.cover.type === "image" &&
+        "position" in defaultConfig.cover
+            ? (defaultConfig.cover.position ?? "center")
+            : "center";
     const defaultCoverSolid =
         defaultConfig.cover.type === "solid"
             ? defaultConfig.cover.color
@@ -162,6 +167,10 @@ export function ProfileEditor({
                 type: "image",
                 url: result.url,
                 path: result.path,
+                position:
+                    config.cover.type === "image"
+                        ? (config.cover.position ?? defaultCoverPosition)
+                        : defaultCoverPosition,
             },
         });
         setTimeout(() => setCoverProgress(null), 800);
@@ -178,6 +187,7 @@ export function ProfileEditor({
                 cover: {
                     type: "image",
                     url: defaultCoverImageUrl,
+                    position: defaultCoverPosition,
                 },
             });
             return;
@@ -247,6 +257,10 @@ export function ProfileEditor({
     };
 
     const cover = config.cover;
+    const coverPosition =
+        cover.type === "image"
+            ? (cover.position ?? defaultCoverPosition)
+            : defaultCoverPosition;
     const gradientColors =
         cover.type === "gradient"
             ? cover.colors
@@ -343,7 +357,7 @@ export function ProfileEditor({
 
                         {profile.type === "image" ? (
                             <div className="grid gap-2">
-                                <div className="flex flex-wrap items-center gap-3">
+                                <div className="flex flex-wrap items-start gap-3">
                                     <Input
                                         type="file"
                                         accept="image/*"
@@ -408,7 +422,7 @@ export function ProfileEditor({
                                 <Label htmlFor="profileColor">
                                     Profile color
                                 </Label>
-                                <div className="flex items-center gap-3">
+                                <div className="flex items-start gap-3">
                                     <ColorInput
                                         value={profile.color}
                                         onChange={(value) =>
@@ -430,7 +444,7 @@ export function ProfileEditor({
                             <div className="grid gap-3">
                                 <div className="grid gap-2">
                                     <Label>Gradient colors</Label>
-                                    <div className="flex flex-wrap items-center gap-3">
+                                    <div className="flex flex-wrap items-start gap-3">
                                         <ColorInput
                                             value={profileGradientColors[0]}
                                             onChange={(value) =>
@@ -573,7 +587,7 @@ export function ProfileEditor({
 
                         {cover.type === "image" ? (
                             <div className="grid gap-2">
-                                <div className="flex flex-wrap items-center gap-3">
+                                <div className="flex flex-wrap items-start gap-3">
                                     <Input
                                         type="file"
                                         accept="image/*"
@@ -591,6 +605,9 @@ export function ProfileEditor({
                                             src={cover.url}
                                             alt="Cover preview"
                                             className="h-12 w-20 rounded-md object-cover"
+                                            style={{
+                                                objectPosition: coverPosition,
+                                            }}
                                         />
                                     ) : null}
                                     <Button
@@ -627,13 +644,55 @@ export function ProfileEditor({
                                         {coverError}
                                     </p>
                                 ) : null}
+                                <div className="grid gap-2">
+                                    <Label>Cover position</Label>
+                                    <select
+                                        className="h-10 rounded-md border border-input bg-background px-3 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                                        value={coverPosition}
+                                        onChange={(event) =>
+                                            onChange({
+                                                ...config,
+                                                cover: {
+                                                    type: "image",
+                                                    url: cover.url,
+                                                    path: cover.path,
+                                                    position:
+                                                        event.target.value,
+                                                },
+                                            })
+                                        }>
+                                        <option value="center">Center</option>
+                                        <option value="top">Top</option>
+                                        <option value="bottom">Bottom</option>
+                                        <option value="left">Left</option>
+                                        <option value="right">Right</option>
+                                        <option value="top left">
+                                            Top left
+                                        </option>
+                                        <option value="top right">
+                                            Top right
+                                        </option>
+                                        <option value="bottom left">
+                                            Bottom left
+                                        </option>
+                                        <option value="bottom right">
+                                            Bottom right
+                                        </option>
+                                        <option value="center left">
+                                            Center left
+                                        </option>
+                                        <option value="center right">
+                                            Center right
+                                        </option>
+                                    </select>
+                                </div>
                             </div>
                         ) : null}
 
                         {cover.type === "solid" ? (
                             <div className="grid gap-2">
                                 <Label htmlFor="coverColor">Cover color</Label>
-                                <div className="flex items-center gap-3">
+                                <div className="flex items-start gap-3">
                                     <ColorInput
                                         value={cover.color}
                                         onChange={(value) =>
@@ -655,7 +714,7 @@ export function ProfileEditor({
                             <div className="grid gap-3">
                                 <div className="grid gap-2">
                                     <Label>Gradient colors</Label>
-                                    <div className="flex flex-wrap items-center gap-3">
+                                    <div className="flex flex-wrap items-start gap-3">
                                         <ColorInput
                                             value={gradientColors[0]}
                                             onChange={(value) =>

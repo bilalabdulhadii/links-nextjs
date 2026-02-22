@@ -109,6 +109,7 @@ export function ThemeEditor({
     };
 
     const background = config.theme.background;
+    const contentCard = config.theme.contentCard;
     const sections = [
         {
             id: "background",
@@ -301,16 +302,96 @@ export function ThemeEditor({
             ),
         },
         {
-            id: "icon-style",
-            title: "Icon Style",
+            id: "text-color",
+            title: "Text Color",
             content: (
                 <CardContent className="pt-0">
-                    <StyleEditor
-                        style={config.theme.iconStyle}
-                        onChange={(iconStyle) =>
-                            updateTheme({ ...config.theme, iconStyle })
-                        }
-                    />
+                    <div className="grid gap-2">
+                        <Label>Title, description, modal, footer</Label>
+                        <ColorInput
+                            value={config.theme.textColor ?? ""}
+                            onChange={(value) =>
+                                updateTheme({
+                                    ...config.theme,
+                                    textColor: value,
+                                })
+                            }
+                            placeholder="0f172a (empty = transparent)"
+                        />
+                    </div>
+                </CardContent>
+            ),
+        },
+        {
+            id: "content-card",
+            title: "Content Card",
+            content: (
+                <CardContent className="pt-0">
+                    <div className="grid gap-4">
+                        <div className="grid gap-2">
+                            <Label>Background color</Label>
+                            <ColorInput
+                                value={contentCard?.bgColor ?? "#ffffff"}
+                                onChange={(value) =>
+                                    updateTheme({
+                                        ...config.theme,
+                                        contentCard: {
+                                            ...contentCard,
+                                            bgColor: value,
+                                        },
+                                    })
+                                }
+                                placeholder="e0f2fe (empty = transparent)"
+                            />
+                        </div>
+                        <div className="grid gap-2">
+                            <Label>Opacity (0 - 100)</Label>
+                            <Input
+                                type="number"
+                                min={0}
+                                max={100}
+                                step={1}
+                                value={contentCard?.opacity ?? 100}
+                                onChange={(event) => {
+                                    const raw = Number(event.target.value);
+                                    const next = Number.isFinite(raw)
+                                        ? Math.max(0, Math.min(100, raw))
+                                        : defaultConfig.theme.contentCard
+                                              .opacity;
+                                    updateTheme({
+                                        ...config.theme,
+                                        contentCard: {
+                                            ...contentCard,
+                                            opacity: next,
+                                        },
+                                    });
+                                }}
+                            />
+                        </div>
+                        <div className="grid gap-2">
+                            <Label>Blur (px)</Label>
+                            <Input
+                                type="number"
+                                min={0}
+                                max={60}
+                                step={1}
+                                value={contentCard?.blur ?? 0}
+                                onChange={(event) => {
+                                    const raw = Number(event.target.value);
+                                    const next = Number.isFinite(raw)
+                                        ? Math.max(0, raw)
+                                        : defaultConfig.theme.contentCard.blur;
+                                    updateTheme({
+                                        ...config.theme,
+                                        contentCard: {
+                                            ...contentCard,
+                                            blur: next,
+                                        },
+                                    });
+                                }}
+                            />
+                        </div>
+                    </div>
                 </CardContent>
             ),
         },
@@ -329,23 +410,16 @@ export function ThemeEditor({
             ),
         },
         {
-            id: "text-color",
-            title: "Text Color",
+            id: "icon-style",
+            title: "Icon Style",
             content: (
                 <CardContent className="pt-0">
-                    <div className="grid gap-2">
-                        <Label>Title, description, modal, footer</Label>
-                        <ColorInput
-                            value={config.theme.textColor ?? ""}
-                            onChange={(value) =>
-                                updateTheme({
-                                    ...config.theme,
-                                    textColor: value,
-                                })
-                            }
-                            placeholder="0f172a (empty = transparent)"
-                        />
-                    </div>
+                    <StyleEditor
+                        style={config.theme.iconStyle}
+                        onChange={(iconStyle) =>
+                            updateTheme({ ...config.theme, iconStyle })
+                        }
+                    />
                 </CardContent>
             ),
         },

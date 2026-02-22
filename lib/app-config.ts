@@ -28,6 +28,7 @@ export type CoverConfig =
           type: "image";
           url: string;
           path?: string;
+          position?: string;
       }
     | {
           type: "solid";
@@ -76,6 +77,11 @@ export type ThemeConfig = {
     background: BackgroundConfig;
     iconStyle: StyleConfig;
     buttonStyle: StyleConfig;
+    contentCard: {
+        bgColor: string;
+        opacity: number;
+        blur: number;
+    };
     textColor: string;
     hoverAnimation: "none" | "lift" | "float" | "pulse" | "pop";
     hoverTransitionMs: number;
@@ -138,6 +144,10 @@ const fallbackCoverGradientDirection =
     defaultCover.type === "gradient" ? defaultCover.direction : "to bottom";
 const fallbackCoverImageUrl =
     defaultCover.type === "image" ? defaultCover.url : "";
+const fallbackCoverPosition =
+    defaultCover.type === "image" && "position" in defaultCover
+        ? defaultCover.position ?? "center"
+        : "center";
 const fallbackProfileSolid =
     defaultProfile.type === "solid" ? defaultProfile.color : "#e2e8f0";
 const fallbackProfileGradientColors =
@@ -208,6 +218,7 @@ function mergeCover(
                 type: "image",
                 url: legacy.coverImageUrl,
                 path: legacy.coverImagePath,
+                position: fallbackCoverPosition,
             };
         }
         return defaultCover;
@@ -224,6 +235,10 @@ function mergeCover(
                 "path" in cover && cover.path
                     ? cover.path
                     : legacy?.coverImagePath,
+            position:
+                "position" in cover && cover.position
+                    ? cover.position
+                    : fallbackCoverPosition,
         };
     }
 
@@ -364,6 +379,12 @@ export function mergeAppConfig(
         typeof rest.unpublishDescription === "string"
             ? rest.unpublishDescription
             : defaultConfig.unpublishDescription;
+    const contentCardOpacity = Number.isFinite(restTheme.contentCard?.opacity)
+        ? Math.max(0, Math.min(100, restTheme.contentCard?.opacity ?? 0))
+        : defaultConfig.theme.contentCard.opacity;
+    const contentCardBlur = Number.isFinite(restTheme.contentCard?.blur)
+        ? Math.max(0, restTheme.contentCard?.blur ?? 0)
+        : defaultConfig.theme.contentCard.blur;
 
     return {
         ...defaultConfig,
@@ -385,6 +406,12 @@ export function mergeAppConfig(
             buttonStyle: {
                 ...defaultConfig.theme.buttonStyle,
                 ...rest.theme?.buttonStyle,
+            },
+            contentCard: {
+                ...defaultConfig.theme.contentCard,
+                ...rest.theme?.contentCard,
+                opacity: contentCardOpacity,
+                blur: contentCardBlur,
             },
         },
         profile: mergeProfile(partial.profile, {

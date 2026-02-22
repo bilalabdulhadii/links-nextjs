@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import type { AppConfig } from "@/lib/app-config";
 import { Background } from "@/components/home/background";
 import { ButtonsSection } from "@/components/home/buttons-section";
@@ -25,6 +25,22 @@ export function HomeView({
     mainClassName?: string;
 }) {
     const resolvedTextColor = textColor || config.theme.textColor || "#0f172a";
+    const contentCard = config.theme.contentCard;
+    const contentOpacity = Math.max(
+        0,
+        Math.min(100, contentCard?.opacity ?? 100),
+    );
+    const cardBackground = toRgba(
+        contentCard?.bgColor ?? "#ffffff",
+        contentOpacity,
+    );
+    const blurValue = contentCard?.blur ?? 0;
+    const blurFilter = blurValue > 0 ? `blur(${blurValue}px)` : undefined;
+    const cardStyle: CSSProperties = {
+        backgroundColor: cardBackground,
+        backdropFilter: blurFilter,
+        WebkitBackdropFilter: blurFilter,
+    };
     const rootClasses = cn(
         "relative overflow-hidden",
         fullHeight ? "min-h-screen" : "min-h-0",
@@ -42,7 +58,9 @@ export function HomeView({
 
             <main className={mainClasses}>
                 <div className="w-full max-w-md">
-                    <div className="relative flex flex-col overflow-hidden rounded-[28px] border border-slate-200/70 bg-white/80 shadow-[0_30px_120px_-60px_rgba(15,23,42,0.25)] backdrop-blur">
+                    <div
+                        className="relative flex flex-col overflow-hidden rounded-[28px] border border-slate-200/70 shadow-[0_30px_120px_-60px_rgba(15,23,42,0.25)]"
+                        style={cardStyle}>
                         <div className="relative h-32 w-full overflow-hidden">
                             {config.cover.type === "image" ? (
                                 // eslint-disable-next-line @next/next/no-img-element
@@ -50,6 +68,10 @@ export function HomeView({
                                     src={config.cover.url}
                                     alt="Cover"
                                     className="h-full w-full object-cover"
+                                    style={{
+                                        objectPosition:
+                                            config.cover.position ?? "center",
+                                    }}
                                 />
                             ) : null}
                             {config.cover.type === "solid" ? (
@@ -71,9 +93,18 @@ export function HomeView({
                             {config.cover.type === "transparent" ? (
                                 <div className="h-full w-full bg-transparent" />
                             ) : null}
-                            {config.cover.type === "image" ? (
-                                <div className="absolute inset-0 bg-linear-to-b from-white/0 via-white/30 to-white/80" />
+                            {config.cover.type !== "transparent" ? (
+                                <div
+                                    className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2"
+                                    style={{
+                                        backgroundImage: `linear-gradient(180deg, rgba(0,0,0,0), ${toRgba(
+                                            contentCard?.bgColor ?? "#ffffff",
+                                            contentOpacity,
+                                        )})`,
+                                    }}
+                                />
                             ) : null}
+                            
                             {headerActions ? (
                                 <div className="absolute right-3 top-3 flex items-center gap-2">
                                     {headerActions}
@@ -92,8 +123,7 @@ export function HomeView({
                                                   backgroundColor:
                                                       config.profile.color,
                                               }
-                                            : config.profile.type ===
-                                                "gradient"
+                                            : config.profile.type === "gradient"
                                               ? {
                                                     backgroundImage: `linear-gradient(${config.profile.direction}, ${config.profile.colors.join(", ")})`,
                                                 }
@@ -156,4 +186,30 @@ export function HomeView({
             </main>
         </div>
     );
+}
+
+function toRgba(color: string, opacity: number) {
+    if (!color) {
+        return "transparent";
+    }
+    const raw = color.trim();
+    if (!raw || raw.toLowerCase() === "transparent") {
+        return "transparent";
+    }
+    const hex = raw.startsWith("#") ? raw.slice(1) : raw;
+    const normalized =
+        hex.length === 3
+            ? hex
+                  .split("")
+                  .map((char) => `${char}${char}`)
+                  .join("")
+            : hex;
+    if (normalized.length !== 6) {
+        return raw;
+    }
+    const r = parseInt(normalized.slice(0, 2), 16);
+    const g = parseInt(normalized.slice(2, 4), 16);
+    const b = parseInt(normalized.slice(4, 6), 16);
+    const alpha = Math.max(0, Math.min(100, opacity)) / 100;
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
