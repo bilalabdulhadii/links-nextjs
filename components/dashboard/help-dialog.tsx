@@ -26,6 +26,10 @@ const shortcuts = [
         label: "Open help",
         keys: ["⌘H", "Ctrl+H"],
     },
+    {
+        label: "Jump to page",
+        keys: ["⌘K", "Ctrl+K"],
+    },
 ];
 
 export function HelpDialog({

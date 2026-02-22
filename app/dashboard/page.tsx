@@ -138,6 +138,18 @@ export default function DashboardOverviewPage() {
                             </kbd>
                         </div>
                     </div>
+                    <div className="flex items-center justify-between gap-4">
+                        <span>Jump to page</span>
+                        <div className="flex items-center gap-2">
+                            <kbd className="rounded border border-border bg-muted px-2 py-1 text-[11px] font-medium text-foreground">
+                                ⌘K
+                            </kbd>
+                            <span className="text-xs">/</span>
+                            <kbd className="rounded border border-border bg-muted px-2 py-1 text-[11px] font-medium text-foreground">
+                                Ctrl+K
+                            </kbd>
+                        </div>
+                    </div>
                 </CardContent>
             </Card>
         </div>

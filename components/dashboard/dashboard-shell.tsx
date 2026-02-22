@@ -12,6 +12,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Button } from "@/components/ui/button";
 import { HelpDialog } from "@/components/dashboard/help-dialog";
+import { JumpCommand } from "@/components/dashboard/jump-command";
 import { Separator } from "@/components/ui/separator";
 import {
     SidebarInset,
@@ -29,7 +30,7 @@ import {
     type UploadResult,
 } from "@/lib/storage";
 import { cn } from "@/lib/utils";
-import { Eye, Save, X } from "lucide-react";
+import { Command, Eye, Save, X, Search } from "lucide-react";
 import {
     Tooltip,
     TooltipContent,
@@ -77,6 +78,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     const pendingRef = useRef<string[]>([]);
     const [isDirty, setIsDirty] = useState(false);
     const [helpOpen, setHelpOpen] = useState(false);
+    const [jumpOpen, setJumpOpen] = useState(false);
 
     useEffect(() => {
         pendingRef.current = pendingPaths;
@@ -256,6 +258,10 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                 event.preventDefault();
                 setHelpOpen(true);
             }
+            if (key === "k") {
+                event.preventDefault();
+                setJumpOpen(true);
+            }
         };
 
         window.addEventListener("keydown", handleKeyDown);
@@ -315,7 +321,10 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     return (
         <DashboardContext.Provider value={contextValue}>
             <SidebarProvider>
-                <AppSidebar onHelp={() => setHelpOpen(true)} />
+                <AppSidebar
+                    onHelp={() => setHelpOpen(true)}
+                    onJump={() => setJumpOpen(true)}
+                />
                 <SidebarInset className="h-svh overflow-hidden">
                     <header className="flex h-16 shrink-0 items-center gap-2">
                         <div className="flex flex-1 items-center gap-2 px-4">
@@ -324,7 +333,17 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                                 orientation="vertical"
                                 className="mr-2 data-[orientation=vertical]:h-4"
                             />
-                            <h1 className="text-base font-medium">Dashboard</h1>
+                            <Button
+                                variant="link"
+                                className="text-muted-foreground !px-0 font-normal hover:no-underline cursor-pointer"
+                                onClick={() => setJumpOpen(true)}>
+                                <Search className="size-4" />
+                                Search
+                                <kbd className="bg-muted inline-flex h-5 items-center gap-1 rounded border px-1.5 text-[10px] font-medium select-none">
+                                    <span className="text-xs">⌘</span>K
+                                </kbd>
+                            </Button>
+                            {/* <h1 className="text-base font-medium">Dashboard</h1> */}
                         </div>
                         <TooltipProvider>
                             <div className="mr-4 flex items-center gap-3">
@@ -417,6 +436,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                 </SidebarInset>
             </SidebarProvider>
             <HelpDialog open={helpOpen} onOpenChange={setHelpOpen} />
+            <JumpCommand open={jumpOpen} onOpenChange={setJumpOpen} />
         </DashboardContext.Provider>
     );
 }

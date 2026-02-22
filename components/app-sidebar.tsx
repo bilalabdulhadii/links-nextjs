@@ -3,6 +3,7 @@
 import * as React from "react";
 import {
     ExternalLink,
+    Command,
     HelpCircle,
     LayoutDashboard,
     Link2,
@@ -63,9 +64,11 @@ const navItems = [
 
 export function AppSidebar({
     onHelp,
+    onJump,
     ...props
 }: React.ComponentProps<typeof Sidebar> & {
     onHelp?: () => void;
+    onJump?: () => void;
 }) {
     const { user, signOutUser } = useAuth();
     const secondary = [
@@ -80,6 +83,15 @@ export function AppSidebar({
             url: "/dashboard/settings",
             icon: Settings2,
         },
+        ...(onJump
+            ? [
+                  {
+                      title: "Jump",
+                      icon: Command,
+                      onClick: onJump,
+                  },
+              ]
+            : []),
         ...(onHelp
             ? [
                   {
