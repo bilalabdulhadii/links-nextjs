@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useDashboard } from "@/components/dashboard/dashboard-shell";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -52,14 +52,14 @@ export default function SettingsPage() {
         draft.unpublishDescription ?? "",
     );
 
-    useEffect(() => {
-        if (!unpublishOpen) {
-            return;
+    const handleUnpublishOpenChange = (open: boolean) => {
+        setUnpublishOpen(open);
+        if (open) {
+            setPendingMode(draft.unpublishMode ?? "coming-soon");
+            setPendingTitle(draft.unpublishTitle ?? "");
+            setPendingDescription(draft.unpublishDescription ?? "");
         }
-        setPendingMode(draft.unpublishMode ?? "coming-soon");
-        setPendingTitle(draft.unpublishTitle ?? "");
-        setPendingDescription(draft.unpublishDescription ?? "");
-    }, [unpublishOpen, draft]);
+    };
 
     const resetProfile = () => {
         const defaults = cloneDefaults();
@@ -120,7 +120,7 @@ export default function SettingsPage() {
             setPublishOpen(true);
             return;
         }
-        setUnpublishOpen(true);
+        handleUnpublishOpenChange(true);
     };
 
     const applyUnpublish = () => {
@@ -157,7 +157,12 @@ export default function SettingsPage() {
                 <CardContent className="space-y-6">
                     <div className="inline-flex flex-wrap gap-1 rounded-lg border border-border/60 bg-muted/40 p-1">
                         {(
-                            ["publishing", "appearance", "reset", "recovery"] as const
+                            [
+                                "publishing",
+                                "appearance",
+                                "reset",
+                                "recovery",
+                            ] as const
                         ).map((item) => (
                             <button
                                 key={item}
@@ -173,16 +178,25 @@ export default function SettingsPage() {
                                     ? "Reset"
                                     : item === "appearance"
                                       ? "Appearance"
-                                    : item === "recovery"
-                                      ? "Recover Theme"
-                                      : "Publishing"}
+                                      : item === "recovery"
+                                        ? "Recover Theme"
+                                        : "Publishing"}
                             </button>
-                            ),
-                        )}
+                        ))}
                     </div>
 
                     {tab === "appearance" ? (
                         <div className="space-y-6">
+                            <div className="space-y-2">
+                                <div>
+                                    <p className="font-medium">Color mode</p>
+                                    <p className="text-sm text-muted-foreground">
+                                        Light, dark, or system color scheme.
+                                    </p>
+                                </div>
+                                <ModeToggle fullWidth={false} />
+                            </div>
+                            <Separator />
                             <div className="space-y-2">
                                 <div>
                                     <p className="font-medium">
@@ -193,16 +207,6 @@ export default function SettingsPage() {
                                     </p>
                                 </div>
                                 <ThemeSelector fullWidth={false} />
-                            </div>
-                            <Separator />
-                            <div className="space-y-2">
-                                <div>
-                                    <p className="font-medium">Color mode</p>
-                                    <p className="text-sm text-muted-foreground">
-                                        Light, dark, or system color scheme.
-                                    </p>
-                                </div>
-                                <ModeToggle fullWidth={false} />
                             </div>
                         </div>
                     ) : tab === "reset" ? (
@@ -480,10 +484,10 @@ export default function SettingsPage() {
                                                 Restore last theme?
                                             </AlertDialogTitle>
                                             <AlertDialogDescription>
-                                                This replaces your current
-                                                theme with the last saved
-                                                backup. You can save or cancel
-                                                after restoring.
+                                                This replaces your current theme
+                                                with the last saved backup. You
+                                                can save or cancel after
+                                                restoring.
                                             </AlertDialogDescription>
                                         </AlertDialogHeader>
                                         <AlertDialogFooter>
@@ -503,7 +507,8 @@ export default function SettingsPage() {
                                                             (button) => {
                                                                 const saved =
                                                                     backup[
-                                                                        button.id
+                                                                        button
+                                                                            .id
                                                                     ];
                                                                 if (!saved) {
                                                                     return button;
@@ -520,7 +525,8 @@ export default function SettingsPage() {
                                                     onChange({
                                                         ...draft,
                                                         theme: draft.themeBackup,
-                                                        buttons: restoredButtons,
+                                                        buttons:
+                                                            restoredButtons,
                                                         themeBackup: undefined,
                                                         buttonStyleBackup:
                                                             undefined,
@@ -543,9 +549,7 @@ export default function SettingsPage() {
                         <div className="space-y-6">
                             <div className="flex flex-wrap items-center justify-between gap-4">
                                 <div>
-                                    <p className="font-medium">
-                                        Publish site
-                                    </p>
+                                    <p className="font-medium">Publish site</p>
                                     <p className="text-sm text-muted-foreground">
                                         Control whether the public page is live
                                         or hidden.
@@ -568,7 +572,9 @@ export default function SettingsPage() {
                                                 onChange({
                                                     ...draft,
                                                     unpublishMode: event.target
-                                                        .value as "coming-soon" | "custom",
+                                                        .value as
+                                                        | "coming-soon"
+                                                        | "custom",
                                                 })
                                             }>
                                             <option value="coming-soon">
@@ -591,13 +597,9 @@ export default function SettingsPage() {
                                     ) : (
                                         <div className="grid gap-4">
                                             <div className="grid gap-2">
-                                                <Label>
-                                                    Custom title
-                                                </Label>
+                                                <Label>Custom title</Label>
                                                 <Input
-                                                    value={
-                                                        draft.unpublishTitle
-                                                    }
+                                                    value={draft.unpublishTitle}
                                                     onChange={(event) =>
                                                         onChange({
                                                             ...draft,
@@ -637,7 +639,9 @@ export default function SettingsPage() {
                 </CardContent>
             </Card>
 
-            <AlertDialog open={unpublishOpen} onOpenChange={setUnpublishOpen}>
+            <AlertDialog
+                open={unpublishOpen}
+                onOpenChange={handleUnpublishOpenChange}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>Unpublish site?</AlertDialogTitle>

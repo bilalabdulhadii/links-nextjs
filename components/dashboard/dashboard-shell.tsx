@@ -22,7 +22,12 @@ import {
 import { DashboardLoading } from "@/components/dashboard/dashboard-loading";
 import { useAppConfig } from "@/hooks/use-app-config";
 import { useAuth } from "@/hooks/use-auth";
-import { defaultConfig, type AppConfig, type ThemeConfig, type StyleConfig } from "@/lib/app-config";
+import {
+    defaultConfig,
+    type AppConfig,
+    type ThemeConfig,
+    type StyleConfig,
+} from "@/lib/app-config";
 import { collectMediaPaths, diffRemovedMediaPaths } from "@/lib/media";
 import {
     deleteMediaPath,
@@ -103,15 +108,13 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     const [saveSignal, setSaveSignal] = useState(0);
     const [themeBackupDraft, setThemeBackupDraft] =
         useState<ThemeConfig | null>(null);
-    const [buttonStyleBackupDraft, setButtonStyleBackupDraft] = useState<
-        Record<
-            string,
-            {
-                useCustomStyle?: boolean;
-                customStyle?: Partial<StyleConfig>;
-            }
-        > | null
-    >(null);
+    const [buttonStyleBackupDraft, setButtonStyleBackupDraft] = useState<Record<
+        string,
+        {
+            useCustomStyle?: boolean;
+            customStyle?: Partial<StyleConfig>;
+        }
+    > | null>(null);
     const [helpOpen, setHelpOpen] = useState(false);
     const [jumpOpen, setJumpOpen] = useState(false);
     const [stylePanelOpen, setStylePanelOpen] = useState(false);
@@ -188,11 +191,9 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                 themeBackupDraft || buttonStyleBackupDraft
                     ? {
                           ...draft,
-                          themeBackup:
-                              themeBackupDraft ?? draft.themeBackup,
+                          themeBackup: themeBackupDraft ?? draft.themeBackup,
                           buttonStyleBackup:
-                              buttonStyleBackupDraft ??
-                              draft.buttonStyleBackup,
+                              buttonStyleBackupDraft ?? draft.buttonStyleBackup,
                       }
                     : draft;
             await save(nextDraft);
@@ -371,7 +372,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                 setButtonStyleBackupDraft((prev) => prev ?? backup),
             clearButtonStyleBackupDraft: () => setButtonStyleBackupDraft(null),
         };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         draft,
         saving,
@@ -522,15 +523,15 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                     <div className="grid gap-4">
                         <div className="grid gap-2">
                             <span className="text-xs text-muted-foreground">
-                                Theme
-                            </span>
-                            <ThemeSelector />
-                        </div>
-                        <div className="grid gap-2">
-                            <span className="text-xs text-muted-foreground">
                                 Mode
                             </span>
                             <ModeToggle />
+                        </div>
+                        <div className="grid gap-2">
+                            <span className="text-xs text-muted-foreground">
+                                Theme
+                            </span>
+                            <ThemeSelector />
                         </div>
                     </div>
                 </DialogContent>

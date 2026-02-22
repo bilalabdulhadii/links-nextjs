@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/hooks/use-auth";
 import Link from "next/link";
+import Image from "next/image";
 
 const navItems = [
     {
@@ -128,8 +129,14 @@ export function AppSidebar({
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
                             <Link href="/dashboard">
-                                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                                    <Link2 className="size-4" />
+                                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-slate-200/90 text-sidebar-primary-foreground">
+                                    <Image
+                                        src="/logo.svg"
+                                        alt="Links"
+                                        width={20}
+                                        height={20}
+                                        className="h-5 w-5"
+                                    />
                                 </div>
                                 <div className="grid flex-1 text-left text-sm leading-tight">
                                     <span className="truncate font-medium">
