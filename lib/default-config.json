@@ -1,8 +1,8 @@
 {
     "siteTitle": "Links",
-    "profileTitle": "Studio Nova",
-    "description": "Design-led products, bold ideas, and the links you asked for.",
-    "published": false,
+    "profileTitle": "Digital Profile",
+    "description": "Links • Projects • Socials",
+    "published": true,
     "unpublishMode": "coming-soon",
     "unpublishTitle": "We'll be right back",
     "unpublishDescription": "We're preparing this page for you. Please check back shortly.",
@@ -18,37 +18,37 @@
     "theme": {
         "background": {
             "type": "gradient",
-            "colors": ["#f8fafc", "#e0f2fe", "#dbeafe"],
-            "direction": "to bottom"
+            "colors": ["#f8fafc", "#dbeafe", "#e0f2fe"],
+            "direction": "to bottom right"
         },
         "iconStyle": {
-            "borderColor": "#cbd5e1",
+            "borderColor": "#e2e8f0",
             "textColor": "#0f172a",
             "bgColor": "#ffffff",
-            "hoverBorderColor": "#64748b",
-            "hoverTextColor": "#0f172a",
-            "hoverBgColor": "#e2e8f0",
+            "hoverBorderColor": "#6366f1",
+            "hoverTextColor": "#4338ca",
+            "hoverBgColor": "#eef2ff",
             "radius": 999,
             "textAlign": "center"
         },
         "buttonStyle": {
-            "borderColor": "#cbd5e1",
+            "borderColor": "#e2e8f0",
             "textColor": "#0f172a",
             "bgColor": "#ffffff",
-            "hoverBorderColor": "#475569",
-            "hoverTextColor": "#0f172a",
-            "hoverBgColor": "#e2e8f0",
+            "hoverBorderColor": "#6366f1",
+            "hoverTextColor": "#4338ca",
+            "hoverBgColor": "#eef2ff",
             "radius": 18,
             "textAlign": "center"
         },
         "contentCard": {
-            "bgColor": "#88caf7",
-            "opacity": 12,
-            "blur": 16
+            "bgColor": "#ffffff",
+            "opacity": 20,
+            "blur": 28
         },
         "textColor": "#0f172a",
-        "hoverAnimation": "lift",
-        "hoverTransitionMs": 260
+        "hoverAnimation": "float",
+        "hoverTransitionMs": 240
     },
     "icons": [
         {
@@ -75,31 +75,44 @@
             "id": "btn-store",
             "layout": "card",
             "eyebrow": "Featured",
-            "label": "Visit Store",
+            "label": "Featured Project",
             "url": "https://example.com",
             "imageUrl": "/images/preview.jpg",
             "useCustomStyle": true,
             "customStyle": {
                 "borderColor": "#bae6fd",
                 "textColor": "#0f172a",
-                "bgColor": "#eff6ff",
-                "hoverBorderColor": "#7dd3fc",
-                "hoverTextColor": "#0f172a",
+                "bgColor": "#f0f9ff",
+                "hoverBorderColor": "#38bdf8",
+                "hoverTextColor": "#075985",
                 "hoverBgColor": "#e0f2fe",
-                "textAlign": "left"
+                "textAlign": "center"
             }
         },
         {
             "id": "btn-newsletter",
             "layout": "icon-text",
-            "label": "Weekly Newsletter",
+            "label": "Latest Updates",
             "url": "https://example.com",
             "iconId": "fa:external"
         },
         {
             "id": "btn-portfolio",
             "layout": "text",
-            "label": "Portfolio",
+            "label": "View Portfolio",
+            "url": "https://example.com"
+        },
+        {
+            "id": "btn-booking",
+            "layout": "icon-text",
+            "label": "Book a Call",
+            "url": "https://example.com",
+            "iconId": "fa:calendar"
+        },
+        {
+            "id": "btn-shop",
+            "layout": "text",
+            "label": "Tools I Use",
             "url": "https://example.com"
         }
     ]
