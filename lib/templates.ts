@@ -19,7 +19,7 @@ export type ThemeTemplate = {
     customButtonStyle: Partial<StyleConfig>;
 };
 
-export const themeTemplates: ThemeTemplate[] = [
+const baseTemplates: ThemeTemplate[] = [
     {
         id: "default-light",
         name: "Default Light",
@@ -74,7 +74,7 @@ export const themeTemplates: ThemeTemplate[] = [
             hoverBorderColor: "#38bdf8",
             hoverTextColor: "#075985",
             hoverBgColor: "#e0f2fe",
-            textAlign: "left",
+            textAlign: "center",
         },
     },
     {
@@ -131,7 +131,7 @@ export const themeTemplates: ThemeTemplate[] = [
             hoverBorderColor: "#38bdf8",
             hoverTextColor: "#075985",
             hoverBgColor: "#e0f2fe",
-            textAlign: "left",
+            textAlign: "center",
         },
     },
     {
@@ -188,7 +188,7 @@ export const themeTemplates: ThemeTemplate[] = [
             hoverBorderColor: "#fb7185",
             hoverTextColor: "#9f1239",
             hoverBgColor: "#ffe4e6",
-            textAlign: "left",
+            textAlign: "center",
         },
     },
     {
@@ -245,7 +245,7 @@ export const themeTemplates: ThemeTemplate[] = [
             hoverBorderColor: "#2dd4bf",
             hoverTextColor: "#115e59",
             hoverBgColor: "#99f6e4",
-            textAlign: "left",
+            textAlign: "center",
         },
     },
     {
@@ -302,7 +302,7 @@ export const themeTemplates: ThemeTemplate[] = [
             hoverBorderColor: "#f472b6",
             hoverTextColor: "#9d174d",
             hoverBgColor: "#fce7f3",
-            textAlign: "left",
+            textAlign: "center",
         },
     },
     {
@@ -359,7 +359,7 @@ export const themeTemplates: ThemeTemplate[] = [
             hoverBorderColor: "#38bdf8",
             hoverTextColor: "#075985",
             hoverBgColor: "#e0f2fe",
-            textAlign: "left",
+            textAlign: "center",
         },
     },
     {
@@ -416,7 +416,7 @@ export const themeTemplates: ThemeTemplate[] = [
             hoverBorderColor: "#34d399",
             hoverTextColor: "#065f46",
             hoverBgColor: "#d1fae5",
-            textAlign: "left",
+            textAlign: "center",
         },
     },
     {
@@ -473,7 +473,7 @@ export const themeTemplates: ThemeTemplate[] = [
             hoverBorderColor: "#38bdf8",
             hoverTextColor: "#0c4a6e",
             hoverBgColor: "#bae6fd",
-            textAlign: "left",
+            textAlign: "center",
         },
     },
     {
@@ -530,7 +530,7 @@ export const themeTemplates: ThemeTemplate[] = [
             hoverBorderColor: "#fb7185",
             hoverTextColor: "#9f1239",
             hoverBgColor: "#ffe4e6",
-            textAlign: "left",
+            textAlign: "center",
         },
     },
     {
@@ -587,7 +587,7 @@ export const themeTemplates: ThemeTemplate[] = [
             hoverBorderColor: "#f472b6",
             hoverTextColor: "#9d174d",
             hoverBgColor: "#fce7f3",
-            textAlign: "left",
+            textAlign: "center",
         },
     },
     {
@@ -643,7 +643,7 @@ export const themeTemplates: ThemeTemplate[] = [
             hoverBorderColor: "#818cf8",
             hoverTextColor: "#312e81",
             hoverBgColor: "#e0e7ff",
-            textAlign: "left",
+            textAlign: "center",
         },
     },
     {
@@ -700,7 +700,7 @@ export const themeTemplates: ThemeTemplate[] = [
             hoverBorderColor: "#22c55e",
             hoverTextColor: "#166534",
             hoverBgColor: "#bbf7d0",
-            textAlign: "left",
+            textAlign: "center",
         },
     },
     {
@@ -757,7 +757,7 @@ export const themeTemplates: ThemeTemplate[] = [
             hoverBorderColor: "#a3e635",
             hoverTextColor: "#365314",
             hoverBgColor: "#d9f99d",
-            textAlign: "left",
+            textAlign: "center",
         },
     },
     {
@@ -814,7 +814,7 @@ export const themeTemplates: ThemeTemplate[] = [
             hoverBorderColor: "#f97316",
             hoverTextColor: "#9a3412",
             hoverBgColor: "#fed7aa",
-            textAlign: "left",
+            textAlign: "center",
         },
     },
     {
@@ -871,7 +871,7 @@ export const themeTemplates: ThemeTemplate[] = [
             hoverBorderColor: "#38bdf8",
             hoverTextColor: "#075985",
             hoverBgColor: "#bae6fd",
-            textAlign: "left",
+            textAlign: "center",
         },
     },
     {
@@ -928,7 +928,7 @@ export const themeTemplates: ThemeTemplate[] = [
             hoverBorderColor: "#fb923c",
             hoverTextColor: "#7c2d12",
             hoverBgColor: "#fed7aa",
-            textAlign: "left",
+            textAlign: "center",
         },
     },
     {
@@ -984,7 +984,7 @@ export const themeTemplates: ThemeTemplate[] = [
             hoverBorderColor: "#22d3ee",
             hoverTextColor: "#0b1020",
             hoverBgColor: "#99f6e4",
-            textAlign: "left",
+            textAlign: "center",
         },
     },
     {
@@ -1041,7 +1041,7 @@ export const themeTemplates: ThemeTemplate[] = [
             hoverBorderColor: "#818cf8",
             hoverTextColor: "#312e81",
             hoverBgColor: "#e0e7ff",
-            textAlign: "left",
+            textAlign: "center",
         },
     },
     {
@@ -1098,7 +1098,7 @@ export const themeTemplates: ThemeTemplate[] = [
             hoverBorderColor: "#38bdf8",
             hoverTextColor: "#075985",
             hoverBgColor: "#bae6fd",
-            textAlign: "left",
+            textAlign: "center",
         },
     },
     {
@@ -1155,7 +1155,7 @@ export const themeTemplates: ThemeTemplate[] = [
             hoverBorderColor: "#fb7185",
             hoverTextColor: "#9f1239",
             hoverBgColor: "#fecdd3",
-            textAlign: "left",
+            textAlign: "center",
         },
     },
     {
@@ -1212,7 +1212,7 @@ export const themeTemplates: ThemeTemplate[] = [
             hoverBorderColor: "#a855f7",
             hoverTextColor: "#6b21a8",
             hoverBgColor: "#ede9fe",
-            textAlign: "left",
+            textAlign: "center",
         },
     },
     {
@@ -1269,7 +1269,7 @@ export const themeTemplates: ThemeTemplate[] = [
             hoverBorderColor: "#f43f5e",
             hoverTextColor: "#be123c",
             hoverBgColor: "#fecdd3",
-            textAlign: "left",
+            textAlign: "center",
         },
     },
     {
@@ -1326,7 +1326,7 @@ export const themeTemplates: ThemeTemplate[] = [
             hoverBorderColor: "#38bdf8",
             hoverTextColor: "#075985",
             hoverBgColor: "#bae6fd",
-            textAlign: "left",
+            textAlign: "center",
         },
     },
     {
@@ -1383,7 +1383,7 @@ export const themeTemplates: ThemeTemplate[] = [
             hoverBorderColor: "#f97316",
             hoverTextColor: "#9a3412",
             hoverBgColor: "#fed7aa",
-            textAlign: "left",
+            textAlign: "center",
         },
     },
     {
@@ -1439,7 +1439,7 @@ export const themeTemplates: ThemeTemplate[] = [
             hoverBorderColor: "#a855f7",
             hoverTextColor: "#0f172a",
             hoverBgColor: "#e9d5ff",
-            textAlign: "left",
+            textAlign: "center",
         },
     },
     {
@@ -1495,7 +1495,7 @@ export const themeTemplates: ThemeTemplate[] = [
             hoverBorderColor: "#f472b6",
             hoverTextColor: "#1e1b4b",
             hoverBgColor: "#fce7f3",
-            textAlign: "left",
+            textAlign: "center",
         },
     },
     {
@@ -1551,7 +1551,7 @@ export const themeTemplates: ThemeTemplate[] = [
             hoverBorderColor: "#22c55e",
             hoverTextColor: "#0f172a",
             hoverBgColor: "#86efac",
-            textAlign: "left",
+            textAlign: "center",
         },
     },
     {
@@ -1607,7 +1607,7 @@ export const themeTemplates: ThemeTemplate[] = [
             hoverBorderColor: "#22d3ee",
             hoverTextColor: "#0b1020",
             hoverBgColor: "#cffafe",
-            textAlign: "left",
+            textAlign: "center",
         },
     },
     {
@@ -1662,7 +1662,7 @@ export const themeTemplates: ThemeTemplate[] = [
             hoverBorderColor: "#e5e7eb",
             hoverTextColor: "#0a0a0a",
             hoverBgColor: "#e5e7eb",
-            textAlign: "left",
+            textAlign: "center",
         },
     },
     {
@@ -1718,7 +1718,7 @@ export const themeTemplates: ThemeTemplate[] = [
             hoverBorderColor: "#d4d4d8",
             hoverTextColor: "#111827",
             hoverBgColor: "#d4d4d8",
-            textAlign: "left",
+            textAlign: "center",
         },
     },
     {
@@ -1774,7 +1774,7 @@ export const themeTemplates: ThemeTemplate[] = [
             hoverBorderColor: "#94a3b8",
             hoverTextColor: "#111827",
             hoverBgColor: "#e2e8f0",
-            textAlign: "left",
+            textAlign: "center",
         },
     },
     {
@@ -1830,7 +1830,7 @@ export const themeTemplates: ThemeTemplate[] = [
             hoverBorderColor: "#a8a29e",
             hoverTextColor: "#292524",
             hoverBgColor: "#e7e5e4",
-            textAlign: "left",
+            textAlign: "center",
         },
     },
     {
@@ -1886,7 +1886,7 @@ export const themeTemplates: ThemeTemplate[] = [
             hoverBorderColor: "#94a3b8",
             hoverTextColor: "#0f172a",
             hoverBgColor: "#cbd5e1",
-            textAlign: "left",
+            textAlign: "center",
         },
     },
     {
@@ -1942,7 +1942,71 @@ export const themeTemplates: ThemeTemplate[] = [
             hoverBorderColor: "#d1d5db",
             hoverTextColor: "#111827",
             hoverBgColor: "#e5e7eb",
-            textAlign: "left",
+            textAlign: "center",
         },
     },
 ];
+
+const radiusPresets = [
+    { icon: 999, button: 18, card: 28 },
+    { icon: 20, button: 16, card: 26 },
+    { icon: 16, button: 14, card: 22 },
+    { icon: 12, button: 10, card: 18 },
+    { icon: 8, button: 8, card: 16 },
+    { icon: 999, button: 999, card: 24 },
+    { icon: 24, button: 20, card: 30 },
+    { icon: 14, button: 12, card: 20 },
+];
+
+const lightCardPresets = [
+    { bgColor: "#ffffff", opacity: 82, blur: 28, radius: 28 },
+    { bgColor: "#f8fafc", opacity: 76, blur: 24, radius: 24 },
+    { bgColor: "#fefce8", opacity: 78, blur: 20, radius: 20 },
+    { bgColor: "#fdf2f8", opacity: 80, blur: 26, radius: 26 },
+    { bgColor: "#ecfeff", opacity: 75, blur: 24, radius: 22 },
+    { bgColor: "#eff6ff", opacity: 70, blur: 22, radius: 24 },
+    { bgColor: "#f1f5f9", opacity: 68, blur: 18, radius: 18 },
+    { bgColor: "#ffffff", opacity: 60, blur: 16, radius: 16 },
+];
+
+const darkCardPresets = [
+    { bgColor: "#0b1220", opacity: 72, blur: 24, radius: 24 },
+    { bgColor: "#0f172a", opacity: 78, blur: 20, radius: 20 },
+    { bgColor: "#111827", opacity: 68, blur: 18, radius: 18 },
+    { bgColor: "#030712", opacity: 70, blur: 22, radius: 22 },
+    { bgColor: "#0a0a0a", opacity: 76, blur: 16, radius: 16 },
+    { bgColor: "#0f172a", opacity: 62, blur: 14, radius: 14 },
+];
+
+export const themeTemplates: ThemeTemplate[] = (() => {
+    let lightIndex = 0;
+    let darkIndex = 0;
+
+    return baseTemplates.map((template, index) => {
+        const radiusPreset = radiusPresets[index % radiusPresets.length];
+        const cardPreset =
+            template.tone === "dark"
+                ? darkCardPresets[darkIndex++ % darkCardPresets.length]
+                : lightCardPresets[lightIndex++ % lightCardPresets.length];
+
+        return {
+            ...template,
+            theme: {
+                ...template.theme,
+                iconStyle: {
+                    ...template.theme.iconStyle,
+                    radius: radiusPreset.icon,
+                },
+                buttonStyle: {
+                    ...template.theme.buttonStyle,
+                    radius: radiusPreset.button,
+                },
+                contentCard: {
+                    ...template.theme.contentCard,
+                    ...cardPreset,
+                    radius: cardPreset.radius ?? radiusPreset.card,
+                },
+            },
+        };
+    });
+})();
