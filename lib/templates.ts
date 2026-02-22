@@ -60,6 +60,8 @@ export const themeTemplates: ThemeTemplate[] = [
                 bgColor: "#ffffff",
                 opacity: 80,
                 blur: 28,
+                radius: 28,
+
             },
             textColor: "#0f172a",
             hoverAnimation: "lift",
@@ -115,6 +117,8 @@ export const themeTemplates: ThemeTemplate[] = [
                 bgColor: "#ffffff",
                 opacity: 78,
                 blur: 28,
+                radius: 28,
+
             },
             textColor: "#0f172a",
             hoverAnimation: "float",
@@ -170,6 +174,8 @@ export const themeTemplates: ThemeTemplate[] = [
                 bgColor: "#ffffff",
                 opacity: 82,
                 blur: 26,
+                radius: 28,
+
             },
             textColor: "#7c2d12",
             hoverAnimation: "lift",
@@ -225,6 +231,8 @@ export const themeTemplates: ThemeTemplate[] = [
                 bgColor: "#ffffff",
                 opacity: 80,
                 blur: 28,
+                radius: 28,
+
             },
             textColor: "#0f766e",
             hoverAnimation: "pop",
@@ -280,6 +288,8 @@ export const themeTemplates: ThemeTemplate[] = [
                 bgColor: "#ffffff",
                 opacity: 78,
                 blur: 26,
+                radius: 28,
+
             },
             textColor: "#4c1d95",
             hoverAnimation: "lift",
@@ -335,6 +345,8 @@ export const themeTemplates: ThemeTemplate[] = [
                 bgColor: "#ffffff",
                 opacity: 80,
                 blur: 24,
+                radius: 28,
+
             },
             textColor: "#92400e",
             hoverAnimation: "pop",
@@ -390,6 +402,8 @@ export const themeTemplates: ThemeTemplate[] = [
                 bgColor: "#ffffff",
                 opacity: 82,
                 blur: 26,
+                radius: 28,
+
             },
             textColor: "#0f172a",
             hoverAnimation: "lift",
@@ -445,6 +459,8 @@ export const themeTemplates: ThemeTemplate[] = [
                 bgColor: "#ffffff",
                 opacity: 80,
                 blur: 28,
+                radius: 28,
+
             },
             textColor: "#0f172a",
             hoverAnimation: "float",
@@ -500,6 +516,8 @@ export const themeTemplates: ThemeTemplate[] = [
                 bgColor: "#ffffff",
                 opacity: 82,
                 blur: 26,
+                radius: 28,
+
             },
             textColor: "#7c2d12",
             hoverAnimation: "lift",
@@ -555,6 +573,8 @@ export const themeTemplates: ThemeTemplate[] = [
                 bgColor: "#ffffff",
                 opacity: 78,
                 blur: 26,
+                radius: 28,
+
             },
             textColor: "#4c1d95",
             hoverAnimation: "float",
@@ -609,6 +629,8 @@ export const themeTemplates: ThemeTemplate[] = [
                 bgColor: "#ffffff",
                 opacity: 84,
                 blur: 24,
+                radius: 28,
+
             },
             textColor: "#0f172a",
             hoverAnimation: "lift",
@@ -664,6 +686,8 @@ export const themeTemplates: ThemeTemplate[] = [
                 bgColor: "#ffffff",
                 opacity: 80,
                 blur: 26,
+                radius: 28,
+
             },
             textColor: "#065f46",
             hoverAnimation: "pop",
@@ -719,6 +743,8 @@ export const themeTemplates: ThemeTemplate[] = [
                 bgColor: "#ffffff",
                 opacity: 82,
                 blur: 24,
+                radius: 28,
+
             },
             textColor: "#92400e",
             hoverAnimation: "lift",
@@ -774,6 +800,8 @@ export const themeTemplates: ThemeTemplate[] = [
                 bgColor: "#ffffff",
                 opacity: 80,
                 blur: 26,
+                radius: 28,
+
             },
             textColor: "#991b1b",
             hoverAnimation: "float",
@@ -829,6 +857,8 @@ export const themeTemplates: ThemeTemplate[] = [
                 bgColor: "#ffffff",
                 opacity: 84,
                 blur: 24,
+                radius: 28,
+
             },
             textColor: "#0f172a",
             hoverAnimation: "float",
@@ -884,6 +914,8 @@ export const themeTemplates: ThemeTemplate[] = [
                 bgColor: "#ffffff",
                 opacity: 82,
                 blur: 24,
+                radius: 28,
+
             },
             textColor: "#7c2d12",
             hoverAnimation: "lift",
@@ -938,6 +970,8 @@ export const themeTemplates: ThemeTemplate[] = [
                 bgColor: "#0b1020",
                 opacity: 76,
                 blur: 26,
+                radius: 28,
+
             },
             textColor: "#f8fafc",
             hoverAnimation: "float",
@@ -993,6 +1027,8 @@ export const themeTemplates: ThemeTemplate[] = [
                 bgColor: "#ffffff",
                 opacity: 84,
                 blur: 24,
+                radius: 28,
+
             },
             textColor: "#1e3a8a",
             hoverAnimation: "float",
@@ -1048,6 +1084,8 @@ export const themeTemplates: ThemeTemplate[] = [
                 bgColor: "#ffffff",
                 opacity: 80,
                 blur: 26,
+                radius: 28,
+
             },
             textColor: "#0e7490",
             hoverAnimation: "pop",
@@ -1103,6 +1141,8 @@ export const themeTemplates: ThemeTemplate[] = [
                 bgColor: "#ffffff",
                 opacity: 80,
                 blur: 24,
+                radius: 28,
+
             },
             textColor: "#9a3412",
             hoverAnimation: "lift",
@@ -1158,6 +1198,8 @@ export const themeTemplates: ThemeTemplate[] = [
                 bgColor: "#ffffff",
                 opacity: 78,
                 blur: 26,
+                radius: 28,
+
             },
             textColor: "#6b21a8",
             hoverAnimation: "float",
@@ -1213,6 +1255,8 @@ export const themeTemplates: ThemeTemplate[] = [
                 bgColor: "#ffffff",
                 opacity: 82,
                 blur: 24,
+                radius: 28,
+
             },
             textColor: "#be123c",
             hoverAnimation: "pop",
@@ -1268,6 +1312,8 @@ export const themeTemplates: ThemeTemplate[] = [
                 bgColor: "#ffffff",
                 opacity: 80,
                 blur: 24,
+                radius: 28,
+
             },
             textColor: "#92400e",
             hoverAnimation: "lift",
@@ -1323,6 +1369,8 @@ export const themeTemplates: ThemeTemplate[] = [
                 bgColor: "#ffffff",
                 opacity: 82,
                 blur: 24,
+                radius: 28,
+
             },
             textColor: "#92400e",
             hoverAnimation: "float",
@@ -1377,6 +1425,8 @@ export const themeTemplates: ThemeTemplate[] = [
                 bgColor: "#0b1020",
                 opacity: 78,
                 blur: 26,
+                radius: 28,
+
             },
             textColor: "#f8fafc",
             hoverAnimation: "float",
@@ -1431,6 +1481,8 @@ export const themeTemplates: ThemeTemplate[] = [
                 bgColor: "#0f172a",
                 opacity: 76,
                 blur: 26,
+                radius: 28,
+
             },
             textColor: "#f8fafc",
             hoverAnimation: "lift",
@@ -1485,6 +1537,8 @@ export const themeTemplates: ThemeTemplate[] = [
                 bgColor: "#0b1020",
                 opacity: 78,
                 blur: 26,
+                radius: 28,
+
             },
             textColor: "#f8fafc",
             hoverAnimation: "pop",
@@ -1539,6 +1593,8 @@ export const themeTemplates: ThemeTemplate[] = [
                 bgColor: "#0b1020",
                 opacity: 74,
                 blur: 26,
+                radius: 28,
+
             },
             textColor: "#f8fafc",
             hoverAnimation: "float",
@@ -1592,6 +1648,8 @@ export const themeTemplates: ThemeTemplate[] = [
                 bgColor: "#0a0a0a",
                 opacity: 82,
                 blur: 22,
+                radius: 28,
+
             },
             textColor: "#f8fafc",
             hoverAnimation: "lift",
@@ -1646,6 +1704,8 @@ export const themeTemplates: ThemeTemplate[] = [
                 bgColor: "#111827",
                 opacity: 78,
                 blur: 22,
+                radius: 28,
+
             },
             textColor: "#fafafa",
             hoverAnimation: "float",
@@ -1700,6 +1760,8 @@ export const themeTemplates: ThemeTemplate[] = [
                 bgColor: "#ffffff",
                 opacity: 86,
                 blur: 24,
+                radius: 28,
+
             },
             textColor: "#111827",
             hoverAnimation: "lift",
@@ -1754,6 +1816,8 @@ export const themeTemplates: ThemeTemplate[] = [
                 bgColor: "#ffffff",
                 opacity: 86,
                 blur: 24,
+                radius: 28,
+
             },
             textColor: "#292524",
             hoverAnimation: "float",
@@ -1808,6 +1872,8 @@ export const themeTemplates: ThemeTemplate[] = [
                 bgColor: "#ffffff",
                 opacity: 84,
                 blur: 24,
+                radius: 28,
+
             },
             textColor: "#0f172a",
             hoverAnimation: "lift",
@@ -1862,6 +1928,8 @@ export const themeTemplates: ThemeTemplate[] = [
                 bgColor: "#0f172a",
                 opacity: 76,
                 blur: 22,
+                radius: 28,
+
             },
             textColor: "#f3f4f6",
             hoverAnimation: "float",

@@ -44,7 +44,8 @@
         "contentCard": {
             "bgColor": "#ffffff",
             "opacity": 20,
-            "blur": 28
+            "blur": 28,
+            "radius": 28
         },
         "textColor": "#0f172a",
         "hoverAnimation": "lift",

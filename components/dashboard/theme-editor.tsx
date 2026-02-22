@@ -391,6 +391,33 @@ export function ThemeEditor({
                                 }}
                             />
                         </div>
+                        <div className="grid gap-2">
+                            <Label>Corner radius (px)</Label>
+                            <Input
+                                type="number"
+                                min={0}
+                                max={60}
+                                step={1}
+                                value={
+                                    contentCard?.radius ??
+                                    defaultConfig.theme.contentCard.radius
+                                }
+                                onChange={(event) => {
+                                    const raw = Number(event.target.value);
+                                    const next = Number.isFinite(raw)
+                                        ? Math.max(0, raw)
+                                        : defaultConfig.theme.contentCard
+                                              .radius;
+                                    updateTheme({
+                                        ...config.theme,
+                                        contentCard: {
+                                            ...contentCard,
+                                            radius: next,
+                                        },
+                                    });
+                                }}
+                            />
+                        </div>
                     </div>
                 </CardContent>
             ),

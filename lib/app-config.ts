@@ -81,6 +81,7 @@ export type ThemeConfig = {
         bgColor: string;
         opacity: number;
         blur: number;
+        radius: number;
     };
     textColor: string;
     hoverAnimation: "none" | "lift" | "float" | "pulse" | "pop";
@@ -393,6 +394,9 @@ export function mergeAppConfig(
     const contentCardBlur = Number.isFinite(restTheme.contentCard?.blur)
         ? Math.max(0, restTheme.contentCard?.blur ?? 0)
         : defaultConfig.theme.contentCard.blur;
+    const contentCardRadius = Number.isFinite(restTheme.contentCard?.radius)
+        ? Math.max(0, restTheme.contentCard?.radius ?? 0)
+        : defaultConfig.theme.contentCard.radius;
 
     return {
         ...defaultConfig,
@@ -420,6 +424,7 @@ export function mergeAppConfig(
                 ...rest.theme?.contentCard,
                 opacity: contentCardOpacity,
                 blur: contentCardBlur,
+                radius: contentCardRadius,
             },
         },
         profile: mergeProfile(partial.profile, {

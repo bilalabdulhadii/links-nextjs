@@ -36,10 +36,12 @@ export function HomeView({
     );
     const blurValue = contentCard?.blur ?? 0;
     const blurFilter = blurValue > 0 ? `blur(${blurValue}px)` : undefined;
+    const cardRadius = contentCard?.radius ?? 28;
     const cardStyle: CSSProperties = {
         backgroundColor: cardBackground,
         backdropFilter: blurFilter,
         WebkitBackdropFilter: blurFilter,
+        borderRadius: `${cardRadius}px`,
     };
     const rootClasses = cn(
         "relative overflow-hidden",
@@ -59,7 +61,7 @@ export function HomeView({
             <main className={mainClasses}>
                 <div className="w-full max-w-md">
                     <div
-                        className="relative flex flex-col overflow-hidden rounded-[28px] border border-slate-200/70 shadow-[0_30px_120px_-60px_rgba(15,23,42,0.25)]"
+                        className="relative flex flex-col overflow-hidden border border-slate-200/70 shadow-[0_30px_120px_-60px_rgba(15,23,42,0.25)]"
                         style={cardStyle}>
                         <div className="relative h-32 w-full overflow-hidden">
                             {config.cover.type === "image" ? (
