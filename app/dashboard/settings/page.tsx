@@ -35,7 +35,9 @@ function cloneDefaults(): AppConfig {
 
 export default function SettingsPage() {
     const { draft, resetAndSave, saving, onChange } = useDashboard();
-    const [tab, setTab] = useState<"reset" | "publishing">("publishing");
+    const [tab, setTab] = useState<"reset" | "publishing" | "recovery">(
+        "publishing",
+    );
     const [unpublishOpen, setUnpublishOpen] = useState(false);
     const [publishOpen, setPublishOpen] = useState(false);
     const [pendingMode, setPendingMode] = useState<"coming-soon" | "custom">(
@@ -152,7 +154,8 @@ export default function SettingsPage() {
                 </CardHeader>
                 <CardContent className="space-y-6">
                     <div className="inline-flex flex-wrap gap-1 rounded-lg border border-border/60 bg-muted/40 p-1">
-                        {(["publishing", "reset"] as const).map((item) => (
+                        {(["publishing", "reset", "recovery"] as const).map(
+                            (item) => (
                             <button
                                 key={item}
                                 type="button"
@@ -163,9 +166,14 @@ export default function SettingsPage() {
                                         ? "bg-background text-foreground shadow-sm"
                                         : "text-muted-foreground hover:text-foreground",
                                 )}>
-                                {item === "reset" ? "Reset" : "Publishing"}
+                                {item === "reset"
+                                    ? "Reset"
+                                    : item === "recovery"
+                                      ? "Recover Theme"
+                                      : "Publishing"}
                             </button>
-                        ))}
+                            ),
+                        )}
                     </div>
 
                     {tab === "reset" ? (
@@ -415,6 +423,93 @@ export default function SettingsPage() {
                                 </AlertDialog>
                             </div>
                         </>
+                    ) : tab === "recovery" ? (
+                        <div className="space-y-4">
+                            <div className="flex flex-wrap items-start justify-between gap-4">
+                                <div>
+                                    <p className="font-medium">
+                                        Recover last theme
+                                    </p>
+                                    <p className="text-sm text-muted-foreground">
+                                        Restore the last theme saved from a
+                                        template change.
+                                    </p>
+                                </div>
+                                <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                        <Button
+                                            variant="outline"
+                                            disabled={
+                                                saving || !draft.themeBackup
+                                            }>
+                                            Restore theme
+                                        </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                            <AlertDialogTitle>
+                                                Restore last theme?
+                                            </AlertDialogTitle>
+                                            <AlertDialogDescription>
+                                                This replaces your current
+                                                theme with the last saved
+                                                backup. You can save or cancel
+                                                after restoring.
+                                            </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                            <AlertDialogCancel>
+                                                Cancel
+                                            </AlertDialogCancel>
+                                            <AlertDialogAction
+                                                onClick={() => {
+                                                    if (!draft.themeBackup) {
+                                                        return;
+                                                    }
+                                                    const backup =
+                                                        draft.buttonStyleBackup ??
+                                                        {};
+                                                    const restoredButtons =
+                                                        draft.buttons.map(
+                                                            (button) => {
+                                                                const saved =
+                                                                    backup[
+                                                                        button.id
+                                                                    ];
+                                                                if (!saved) {
+                                                                    return button;
+                                                                }
+                                                                return {
+                                                                    ...button,
+                                                                    useCustomStyle:
+                                                                        saved.useCustomStyle,
+                                                                    customStyle:
+                                                                        saved.customStyle,
+                                                                };
+                                                            },
+                                                        );
+                                                    onChange({
+                                                        ...draft,
+                                                        theme: draft.themeBackup,
+                                                        buttons: restoredButtons,
+                                                        themeBackup: undefined,
+                                                        buttonStyleBackup:
+                                                            undefined,
+                                                    });
+                                                }}>
+                                                Restore theme
+                                            </AlertDialogAction>
+                                        </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                </AlertDialog>
+                            </div>
+                            {!draft.themeBackup ? (
+                                <div className="rounded-xl border border-border/60 bg-muted/40 p-4 text-sm text-muted-foreground">
+                                    No theme backup available yet. Apply a
+                                    template and save once to create a backup.
+                                </div>
+                            ) : null}
+                        </div>
                     ) : (
                         <div className="space-y-6">
                             <div className="flex flex-wrap items-center justify-between gap-4">

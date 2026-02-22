@@ -22,7 +22,7 @@ import {
 import { DashboardLoading } from "@/components/dashboard/dashboard-loading";
 import { useAppConfig } from "@/hooks/use-app-config";
 import { useAuth } from "@/hooks/use-auth";
-import { defaultConfig, type AppConfig } from "@/lib/app-config";
+import { defaultConfig, type AppConfig, type ThemeConfig, type StyleConfig } from "@/lib/app-config";
 import { collectMediaPaths, diffRemovedMediaPaths } from "@/lib/media";
 import {
     deleteMediaPath,
@@ -53,6 +53,20 @@ type DashboardContextValue = {
     status: string | null;
     error: string | null;
     isDirty: boolean;
+    cancelSignal: number;
+    saveSignal: number;
+    rememberThemeBackup: (theme: ThemeConfig) => void;
+    clearThemeBackupDraft: () => void;
+    rememberButtonStyleBackup: (
+        backup: Record<
+            string,
+            {
+                useCustomStyle?: boolean;
+                customStyle?: Partial<StyleConfig>;
+            }
+        >,
+    ) => void;
+    clearButtonStyleBackupDraft: () => void;
 };
 
 const DashboardContext = createContext<DashboardContextValue | null>(null);
@@ -77,6 +91,19 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     const [pendingPaths, setPendingPaths] = useState<string[]>([]);
     const pendingRef = useRef<string[]>([]);
     const [isDirty, setIsDirty] = useState(false);
+    const [cancelSignal, setCancelSignal] = useState(0);
+    const [saveSignal, setSaveSignal] = useState(0);
+    const [themeBackupDraft, setThemeBackupDraft] =
+        useState<ThemeConfig | null>(null);
+    const [buttonStyleBackupDraft, setButtonStyleBackupDraft] = useState<
+        Record<
+            string,
+            {
+                useCustomStyle?: boolean;
+                customStyle?: Partial<StyleConfig>;
+            }
+        > | null
+    >(null);
     const [helpOpen, setHelpOpen] = useState(false);
     const [jumpOpen, setJumpOpen] = useState(false);
 
@@ -139,6 +166,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         setStatus(null);
     };
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const onSave = async () => {
         if (!draft) {
             return;
@@ -147,9 +175,20 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         setStatus(null);
 
         try {
-            await save(draft);
-            const removed = diffRemovedMediaPaths(savedConfig, draft);
-            const draftPaths = new Set(collectMediaPaths(draft));
+            const nextDraft =
+                themeBackupDraft || buttonStyleBackupDraft
+                    ? {
+                          ...draft,
+                          themeBackup:
+                              themeBackupDraft ?? draft.themeBackup,
+                          buttonStyleBackup:
+                              buttonStyleBackupDraft ??
+                              draft.buttonStyleBackup,
+                      }
+                    : draft;
+            await save(nextDraft);
+            const removed = diffRemovedMediaPaths(savedConfig, nextDraft);
+            const draftPaths = new Set(collectMediaPaths(nextDraft));
             const pendingToDelete = pendingPaths.filter(
                 (path) => !draftPaths.has(path),
             );
@@ -158,9 +197,13 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                 toDelete.map((path) => deleteMediaPath(path)),
             );
             setPendingPaths([]);
-            setSavedConfig(draft);
+            setSavedConfig(nextDraft);
+            setDraft(nextDraft);
             setIsDirty(false);
+            setThemeBackupDraft(null);
+            setButtonStyleBackupDraft(null);
             setStatus("Changes saved.");
+            setSaveSignal((prev) => prev + 1);
         } catch (err) {
             const message =
                 err instanceof Error ? err.message : "Failed to save";
@@ -178,8 +221,8 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         setStatus(null);
 
         try {
-            await save(next);
             const baseline = savedConfig ?? draft ?? defaultConfig;
+            await save(next);
             const removed = diffRemovedMediaPaths(baseline, next);
             const nextPaths = new Set(collectMediaPaths(next));
             const pendingToDelete = pendingPaths.filter(
@@ -193,7 +236,10 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             setSavedConfig(next);
             setDraft(next);
             setIsDirty(false);
+            setThemeBackupDraft(null);
+            setButtonStyleBackupDraft(null);
             setStatus("Changes saved.");
+            setSaveSignal((prev) => prev + 1);
         } catch (err) {
             const message =
                 err instanceof Error ? err.message : "Failed to reset";
@@ -203,6 +249,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         }
     };
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const onCancel = () => {
         if (!savedConfig || !draft) {
             return;
@@ -210,6 +257,9 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         setDraft(savedConfig);
         setIsDirty(false);
         setStatus(null);
+        setCancelSignal((prev) => prev + 1);
+        setThemeBackupDraft(null);
+        setButtonStyleBackupDraft(null);
     };
 
     useEffect(() => {
@@ -284,6 +334,12 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                 status: null,
                 error: error ?? null,
                 isDirty: false,
+                cancelSignal: 0,
+                saveSignal: 0,
+                rememberThemeBackup: () => undefined,
+                clearThemeBackupDraft: () => undefined,
+                rememberButtonStyleBackup: () => undefined,
+                clearButtonStyleBackupDraft: () => undefined,
             };
         }
         return {
@@ -297,7 +353,16 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             status,
             error: error ?? null,
             isDirty,
+            cancelSignal,
+            saveSignal,
+            rememberThemeBackup: (theme: ThemeConfig) =>
+                setThemeBackupDraft((prev) => prev ?? theme),
+            clearThemeBackupDraft: () => setThemeBackupDraft(null),
+            rememberButtonStyleBackup: (backup) =>
+                setButtonStyleBackupDraft((prev) => prev ?? backup),
+            clearButtonStyleBackupDraft: () => setButtonStyleBackupDraft(null),
         };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         draft,
         saving,
@@ -308,6 +373,10 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         onSave,
         onCancel,
         config,
+        cancelSignal,
+        saveSignal,
+        themeBackupDraft,
+        buttonStyleBackupDraft,
     ]);
 
     if (loading) {

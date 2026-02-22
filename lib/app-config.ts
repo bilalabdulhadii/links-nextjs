@@ -122,6 +122,14 @@ export type AppConfig = {
     profile: ProfileConfig;
     cover: CoverConfig;
     theme: ThemeConfig;
+    themeBackup?: ThemeConfig;
+    buttonStyleBackup?: Record<
+        string,
+        {
+            useCustomStyle?: boolean;
+            customStyle?: Partial<StyleConfig>;
+        }
+    >;
     icons: IconItem[];
     buttons: ButtonItem[];
 };

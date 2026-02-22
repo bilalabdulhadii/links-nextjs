@@ -47,7 +47,7 @@
             "blur": 28
         },
         "textColor": "#0f172a",
-        "hoverAnimation": "float",
+        "hoverAnimation": "lift",
         "hoverTransitionMs": 240
     },
     "icons": [

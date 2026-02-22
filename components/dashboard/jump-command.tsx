@@ -13,6 +13,7 @@ import {
     ExternalLink,
     LayoutDashboard,
     Link2,
+    LayoutTemplate,
     Monitor,
     Palette,
     Settings2,
@@ -27,6 +28,7 @@ const jumpItems = [
     { title: "Icons", url: "/dashboard/icons", icon: Share2 },
     { title: "Buttons", url: "/dashboard/buttons", icon: Link2 },
     { title: "Theme", url: "/dashboard/theme", icon: Palette },
+    { title: "Templates", url: "/dashboard/templates", icon: LayoutTemplate },
     { title: "Settings", url: "/dashboard/settings", icon: Settings2 },
     { title: "Public Site", url: "/", icon: ExternalLink, external: true },
 ];

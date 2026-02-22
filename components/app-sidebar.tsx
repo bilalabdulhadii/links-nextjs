@@ -6,6 +6,7 @@ import {
     Command,
     HelpCircle,
     LayoutDashboard,
+    LayoutTemplate,
     Link2,
     Monitor,
     Palette,
@@ -59,6 +60,11 @@ const navItems = [
         title: "Theme",
         url: "/dashboard/theme",
         icon: Palette,
+    },
+    {
+        title: "Templates",
+        url: "/dashboard/templates",
+        icon: LayoutTemplate,
     },
 ];
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
@@ -16,7 +16,7 @@ export function ColorInput({
     className?: string;
 }) {
     const [draft, setDraft] = useState(() => formatInputValue(value));
-    const lastValueRef = useRef(value);
+    const [isEditing, setIsEditing] = useState(false);
     const colorValue = toHexColor(value) ?? "#000000";
     const normalized = value?.trim();
     const isTransparent =
@@ -32,12 +32,7 @@ export function ColorInput({
           }
         : { backgroundColor: normalized };
 
-    useEffect(() => {
-        if (value !== lastValueRef.current) {
-            lastValueRef.current = value;
-            setDraft(formatInputValue(value));
-        }
-    }, [value]);
+    const displayValue = isEditing ? draft : formatInputValue(value);
 
     return (
         <div className={cn("flex items-center gap-2", className)}>
@@ -51,8 +46,8 @@ export function ColorInput({
                     value={colorValue}
                     onChange={(event) => {
                         const next = event.target.value;
-                        lastValueRef.current = next;
                         setDraft(formatInputValue(next));
+                        setIsEditing(false);
                         onChange(next);
                     }}
                     className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
@@ -60,11 +55,15 @@ export function ColorInput({
                 />
             </label>
             <Input
-                value={draft}
+                value={displayValue}
+                onFocus={() => {
+                    setIsEditing(true);
+                    setDraft(formatInputValue(value));
+                }}
                 onChange={(event) => {
+                    setIsEditing(true);
                     const raw = event.target.value.trim();
                     if (raw.toLowerCase() === "transparent") {
-                        lastValueRef.current = "";
                         setDraft("");
                         onChange("");
                         return;
@@ -73,7 +72,6 @@ export function ColorInput({
                         const parsed = parseRgb(raw);
                         if (parsed) {
                             const hex = rgbToHex(parsed);
-                            lastValueRef.current = `#${hex}`;
                             setDraft(hex);
                             onChange(`#${hex}`);
                             return;
@@ -82,13 +80,11 @@ export function ColorInput({
                     const cleaned = normalizeHexInput(raw);
                     setDraft(cleaned);
                     if (!cleaned) {
-                        lastValueRef.current = "";
                         onChange("");
                         return;
                     }
                     if (cleaned.length === 6) {
                         const next = `#${cleaned}`;
-                        lastValueRef.current = next;
                         onChange(next);
                     }
                 }}
@@ -96,20 +92,20 @@ export function ColorInput({
                     const cleaned = normalizeHexInput(draft);
                     if (!cleaned) {
                         if (value) {
-                            lastValueRef.current = "";
                             onChange("");
                         }
+                        setIsEditing(false);
                         return;
                     }
                     if (cleaned.length === 6) {
                         const next = `#${cleaned}`;
-                        lastValueRef.current = next;
                         onChange(next);
+                        setIsEditing(false);
                         return;
                     }
-                    lastValueRef.current = "";
                     setDraft("");
                     onChange("");
+                    setIsEditing(false);
                 }}
                 placeholder={placeholder}
             />
@@ -188,7 +184,9 @@ function toHexColor(value: string): string | null {
     return null;
 }
 
-function parseRgb(value: string): { r: number; g: number; b: number } | null {
+function parseRgb(
+    value: string,
+): { r: number; g: number; b: number; a?: number } | null {
     const rgbMatch = value.match(/rgba?\(([^)]+)\)/i);
     if (!rgbMatch) {
         return null;
@@ -207,6 +205,11 @@ function parseRgb(value: string): { r: number; g: number; b: number } | null {
     const r = toChannel(parts[0]);
     const g = toChannel(parts[1]);
     const b = toChannel(parts[2]);
+    const alphaPart = parts[3];
+    if (alphaPart !== undefined) {
+        const alpha = Math.max(0, Math.min(1, parseFloat(alphaPart)));
+        return { r, g, b, a: Number.isNaN(alpha) ? undefined : alpha };
+    }
     return { r, g, b };
 }
 
