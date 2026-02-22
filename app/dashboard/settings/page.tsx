@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
+import { ModeToggle } from "@/components/ui/mode-toggle";
+import { ThemeSelector } from "@/components/ui/theme-selector";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -35,9 +37,9 @@ function cloneDefaults(): AppConfig {
 
 export default function SettingsPage() {
     const { draft, resetAndSave, saving, onChange } = useDashboard();
-    const [tab, setTab] = useState<"reset" | "publishing" | "recovery">(
-        "publishing",
-    );
+    const [tab, setTab] = useState<
+        "publishing" | "appearance" | "reset" | "recovery"
+    >("publishing");
     const [unpublishOpen, setUnpublishOpen] = useState(false);
     const [publishOpen, setPublishOpen] = useState(false);
     const [pendingMode, setPendingMode] = useState<"coming-soon" | "custom">(
@@ -154,8 +156,9 @@ export default function SettingsPage() {
                 </CardHeader>
                 <CardContent className="space-y-6">
                     <div className="inline-flex flex-wrap gap-1 rounded-lg border border-border/60 bg-muted/40 p-1">
-                        {(["publishing", "reset", "recovery"] as const).map(
-                            (item) => (
+                        {(
+                            ["publishing", "appearance", "reset", "recovery"] as const
+                        ).map((item) => (
                             <button
                                 key={item}
                                 type="button"
@@ -168,6 +171,8 @@ export default function SettingsPage() {
                                 )}>
                                 {item === "reset"
                                     ? "Reset"
+                                    : item === "appearance"
+                                      ? "Appearance"
                                     : item === "recovery"
                                       ? "Recover Theme"
                                       : "Publishing"}
@@ -176,7 +181,31 @@ export default function SettingsPage() {
                         )}
                     </div>
 
-                    {tab === "reset" ? (
+                    {tab === "appearance" ? (
+                        <div className="space-y-6">
+                            <div className="space-y-2">
+                                <div>
+                                    <p className="font-medium">
+                                        Dashboard theme
+                                    </p>
+                                    <p className="text-sm text-muted-foreground">
+                                        Controls the admin UI theme preview.
+                                    </p>
+                                </div>
+                                <ThemeSelector fullWidth={false} />
+                            </div>
+                            <Separator />
+                            <div className="space-y-2">
+                                <div>
+                                    <p className="font-medium">Color mode</p>
+                                    <p className="text-sm text-muted-foreground">
+                                        Light, dark, or system color scheme.
+                                    </p>
+                                </div>
+                                <ModeToggle fullWidth={false} />
+                            </div>
+                        </div>
+                    ) : tab === "reset" ? (
                         <>
                             <div className="space-y-4">
                                 <div className="flex flex-wrap items-start justify-between gap-4">

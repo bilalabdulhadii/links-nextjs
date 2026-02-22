@@ -10,6 +10,7 @@ import {
     Link2,
     Monitor,
     Palette,
+    SlidersHorizontal,
     Settings2,
     Share2,
     UserCircle2,
@@ -71,10 +72,12 @@ const navItems = [
 export function AppSidebar({
     onHelp,
     onJump,
+    onStyle,
     ...props
 }: React.ComponentProps<typeof Sidebar> & {
     onHelp?: () => void;
     onJump?: () => void;
+    onStyle?: () => void;
 }) {
     const { user, signOutUser } = useAuth();
     const secondary = [
@@ -89,6 +92,15 @@ export function AppSidebar({
             url: "/dashboard/settings",
             icon: Settings2,
         },
+        ...(onStyle
+            ? [
+                  {
+                      title: "Style",
+                      icon: SlidersHorizontal,
+                      onClick: onStyle,
+                  },
+              ]
+            : []),
         ...(onJump
             ? [
                   {

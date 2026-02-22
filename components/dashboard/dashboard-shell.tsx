@@ -37,6 +37,14 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { ThemeSelector } from "@/components/ui/theme-selector";
+import { ModeToggle } from "@/components/ui/mode-toggle";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
 
 type DashboardContextValue = {
     draft: AppConfig;
@@ -106,6 +114,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     >(null);
     const [helpOpen, setHelpOpen] = useState(false);
     const [jumpOpen, setJumpOpen] = useState(false);
+    const [stylePanelOpen, setStylePanelOpen] = useState(false);
 
     useEffect(() => {
         pendingRef.current = pendingPaths;
@@ -393,6 +402,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                 <AppSidebar
                     onHelp={() => setHelpOpen(true)}
                     onJump={() => setJumpOpen(true)}
+                    onStyle={() => setStylePanelOpen(true)}
                 />
                 <SidebarInset className="h-svh overflow-hidden">
                     <header className="flex h-16 shrink-0 items-center gap-2">
@@ -504,6 +514,27 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                     </div>
                 </SidebarInset>
             </SidebarProvider>
+            <Dialog open={stylePanelOpen} onOpenChange={setStylePanelOpen}>
+                <DialogContent className="sm:max-w-sm">
+                    <DialogHeader>
+                        <DialogTitle>Appearance</DialogTitle>
+                    </DialogHeader>
+                    <div className="grid gap-4">
+                        <div className="grid gap-2">
+                            <span className="text-xs text-muted-foreground">
+                                Theme
+                            </span>
+                            <ThemeSelector />
+                        </div>
+                        <div className="grid gap-2">
+                            <span className="text-xs text-muted-foreground">
+                                Mode
+                            </span>
+                            <ModeToggle />
+                        </div>
+                    </div>
+                </DialogContent>
+            </Dialog>
             <HelpDialog open={helpOpen} onOpenChange={setHelpOpen} />
             <JumpCommand open={jumpOpen} onOpenChange={setJumpOpen} />
         </DashboardContext.Provider>
