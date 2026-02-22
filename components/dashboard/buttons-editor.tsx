@@ -4,6 +4,11 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ColorInput } from "@/components/ui/color-input";
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { IconSelect } from "@/components/ui/icon-select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,6 +16,8 @@ import { iconOptions } from "@/lib/icons";
 import { createId } from "@/lib/id";
 import type { AppConfig, ButtonItem, ButtonLayout } from "@/lib/app-config";
 import type { UploadResult } from "@/lib/storage";
+import { ChevronDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const layoutOptions: { value: ButtonLayout; label: string }[] = [
     { value: "card", label: "Card + text" },
@@ -38,6 +45,9 @@ export function ButtonsEditor({
     const [uploadProgress, setUploadProgress] = useState<
         Record<string, number | null>
     >({});
+    const [openIds, setOpenIds] = useState<string[]>(() =>
+        config.buttons[0]?.id ? [config.buttons[0].id] : [],
+    );
 
     const updateButtons = (buttons: ButtonItem[]) => {
         onChange({ ...config, buttons });
@@ -131,343 +141,409 @@ export function ButtonsEditor({
                 </Button>
             </CardHeader>
             <CardContent className="space-y-6">
-                {config.buttons.map((button, index) => (
-                    <div
-                        key={button.id}
-                        className="rounded-lg border border-border p-4">
-                        <div className="grid gap-4 md:grid-cols-[1fr_1fr_200px]">
-                            <div className="grid gap-2">
-                                <Label>Label</Label>
-                                <Input
-                                    value={button.label}
-                                    onChange={(event) =>
-                                        updateButton(index, {
-                                            label: event.target.value,
-                                        })
-                                    }
-                                />
-                            </div>
-                            <div className="grid gap-2">
-                                <Label>URL</Label>
-                                <Input
-                                    value={button.url}
-                                    onChange={(event) =>
-                                        updateButton(index, {
-                                            url: event.target.value,
-                                        })
-                                    }
-                                />
-                            </div>
-                            <div className="grid gap-2">
-                                <Label>Layout</Label>
-                                <select
-                                    className="h-10 rounded-md border border-input bg-background px-3 text-sm"
-                                    value={button.layout}
-                                    onChange={(event) =>
-                                        updateButton(index, {
-                                            layout: event.target
-                                                .value as ButtonLayout,
-                                            iconId:
-                                                button.iconId ??
-                                                iconOptions[0]?.id ??
-                                                "fa:link",
-                                        })
-                                    }>
-                                    {layoutOptions.map((option) => (
-                                        <option
-                                            key={option.value}
-                                            value={option.value}>
-                                            {option.label}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-
-                        {button.layout === "card" ? (
-                            <div className="mt-4 grid gap-4">
-                                <div className="grid gap-2">
-                                    <Label>Top label (optional)</Label>
-                                    <Input
-                                        value={button.eyebrow ?? ""}
-                                        placeholder="Featured"
-                                        onChange={(event) =>
-                                            updateButton(index, {
-                                                eyebrow: event.target.value,
-                                            })
-                                        }
-                                    />
-                                </div>
-                                <div className="grid gap-2">
-                                    <Label>Card image</Label>
-                                    <div className="flex flex-wrap items-center gap-3">
-                                        <Input
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={(event) => {
-                                                const file =
-                                                    event.target.files?.[0];
-                                                if (file) {
-                                                    void handleImageUpload(
-                                                        index,
-                                                        file,
-                                                    );
-                                                }
-                                            }}
-                                        />
-                                        {button.imageUrl ? (
-                                            // eslint-disable-next-line @next/next/no-img-element
-                                            <img
-                                                src={button.imageUrl}
-                                                alt="Card preview"
-                                                className="h-16 w-24 rounded-lg object-cover"
-                                            />
-                                        ) : null}
-                                    {button.imageUrl ? (
-                                        <Button
-                                            type="button"
-                                            size="sm"
-                                            variant="outline"
-                                                onClick={() =>
-                                                    updateButton(index, {
-                                                        imageUrl: "",
-                                                        imagePath: "",
-                                                    })
-                                                }>
-                                                Remove image
-                                            </Button>
-                                        ) : null}
+                {config.buttons.map((button, index) => {
+                    const isOpen = openIds.includes(button.id);
+                    return (
+                        <Collapsible
+                            key={button.id}
+                            open={isOpen}
+                            onOpenChange={(open) =>
+                                setOpenIds((prev) =>
+                                    open
+                                        ? [...new Set([...prev, button.id])]
+                                        : prev.filter((id) => id !== button.id),
+                                )
+                            }
+                            className="rounded-lg border border-border">
+                            <CollapsibleTrigger asChild>
+                                <button
+                                    type="button"
+                                    className="flex w-full items-center justify-between gap-4 px-4 py-3 text-left">
+                                    <div className="space-y-0.5">
+                                        <p className="text-sm font-medium">
+                                            {button.label || "Untitled button"}
+                                        </p>
+                                        <p className="text-xs text-muted-foreground">
+                                            {button.layout === "card"
+                                                ? "Card + text"
+                                                : button.layout === "icon-text"
+                                                  ? "Icon + text"
+                                                  : button.layout ===
+                                                      "icon-only"
+                                                    ? "Icon only"
+                                                    : "Text only"}
+                                        </p>
                                     </div>
-                                    {uploadProgress[button.id] !== null &&
-                                    uploadProgress[button.id] !==
-                                        undefined ? (
-                                        <div className="space-y-1">
-                                            <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
-                                                <div
-                                                    className="h-full rounded-full bg-foreground transition-all"
-                                                    style={{
-                                                        width: `${uploadProgress[button.id]}%`,
+                                    <ChevronDown
+                                        className={cn(
+                                            "h-4 w-4 text-muted-foreground transition-transform",
+                                            isOpen ? "rotate-180" : "rotate-0",
+                                        )}
+                                    />
+                                </button>
+                            </CollapsibleTrigger>
+                            <CollapsibleContent className="border-t border-border/60 p-4">
+                                <div className="grid gap-4 md:grid-cols-[1fr_1fr_200px]">
+                                    <div className="grid gap-2">
+                                        <Label>Label</Label>
+                                        <Input
+                                            value={button.label}
+                                            onChange={(event) =>
+                                                updateButton(index, {
+                                                    label: event.target.value,
+                                                })
+                                            }
+                                        />
+                                    </div>
+                                    <div className="grid gap-2">
+                                        <Label>URL</Label>
+                                        <Input
+                                            value={button.url}
+                                            onChange={(event) =>
+                                                updateButton(index, {
+                                                    url: event.target.value,
+                                                })
+                                            }
+                                        />
+                                    </div>
+                                    <div className="grid gap-2">
+                                        <Label>Layout</Label>
+                                        <select
+                                            className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+                                            value={button.layout}
+                                            onChange={(event) =>
+                                                updateButton(index, {
+                                                    layout: event.target
+                                                        .value as ButtonLayout,
+                                                    iconId:
+                                                        button.iconId ??
+                                                        iconOptions[0]?.id ??
+                                                        "fa:link",
+                                                })
+                                            }>
+                                            {layoutOptions.map((option) => (
+                                                <option
+                                                    key={option.value}
+                                                    value={option.value}>
+                                                    {option.label}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {button.layout === "card" ? (
+                                    <div className="mt-4 grid gap-4">
+                                        <div className="grid gap-2">
+                                            <Label>Top label (optional)</Label>
+                                            <Input
+                                                value={button.eyebrow ?? ""}
+                                                placeholder="Featured"
+                                                onChange={(event) =>
+                                                    updateButton(index, {
+                                                        eyebrow: event.target
+                                                            .value,
+                                                    })
+                                                }
+                                            />
+                                        </div>
+                                        <div className="grid gap-2">
+                                            <Label>Card image</Label>
+                                            <div className="flex flex-wrap items-center gap-3">
+                                                <Input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    onChange={(event) => {
+                                                        const file =
+                                                            event.target
+                                                                .files?.[0];
+                                                        if (file) {
+                                                            void handleImageUpload(
+                                                                index,
+                                                                file,
+                                                            );
+                                                        }
                                                     }}
                                                 />
+                                                {button.imageUrl ? (
+                                                    // eslint-disable-next-line @next/next/no-img-element
+                                                    <img
+                                                        src={button.imageUrl}
+                                                        alt="Card preview"
+                                                        className="h-16 w-24 rounded-lg object-cover"
+                                                    />
+                                                ) : null}
+                                                {button.imageUrl ? (
+                                                    <Button
+                                                        type="button"
+                                                        size="sm"
+                                                        variant="outline"
+                                                        onClick={() =>
+                                                            updateButton(
+                                                                index,
+                                                                {
+                                                                    imageUrl:
+                                                                        "",
+                                                                    imagePath:
+                                                                        "",
+                                                                },
+                                                            )
+                                                        }>
+                                                        Remove image
+                                                    </Button>
+                                                ) : null}
                                             </div>
-                                            <p className="text-xs text-muted-foreground">
-                                                Uploading...{" "}
-                                                {uploadProgress[button.id]}%
-                                            </p>
+                                            {uploadProgress[button.id] !==
+                                            null &&
+                                            uploadProgress[button.id] !==
+                                                undefined ? (
+                                                <div className="space-y-1">
+                                                    <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                                                        <div
+                                                            className="h-full rounded-full bg-foreground transition-all"
+                                                            style={{
+                                                                width: `${uploadProgress[button.id]}%`,
+                                                            }}
+                                                        />
+                                                    </div>
+                                                    <p className="text-xs text-muted-foreground">
+                                                        Uploading...{" "}
+                                                        {uploadProgress[
+                                                            button.id
+                                                        ]}
+                                                        %
+                                                    </p>
+                                                </div>
+                                            ) : null}
+                                            {errors[button.id] ? (
+                                                <p className="text-sm text-destructive">
+                                                    {errors[button.id]}
+                                                </p>
+                                            ) : null}
                                         </div>
-                                    ) : null}
-                                    {errors[button.id] ? (
-                                        <p className="text-sm text-destructive">
-                                            {errors[button.id]}
-                                        </p>
-                                    ) : null}
-                                </div>
-                            </div>
-                        ) : null}
+                                    </div>
+                                ) : null}
 
-                        {button.layout !== "text" &&
-                        button.layout !== "card" ? (
-                            <div className="mt-4 grid gap-2">
-                                <Label>Icon</Label>
-                                <IconSelect
-                                    options={iconOptions}
-                                    value={button.iconId ?? iconOptions[0]?.id ?? "fa:link"}
-                                    onChange={(value) =>
-                                        updateButton(index, {
-                                            iconId: value,
-                                        })
-                                    }
-                                />
-                            </div>
-                        ) : null}
+                                {button.layout !== "text" &&
+                                button.layout !== "card" ? (
+                                    <div className="mt-4 grid gap-2">
+                                        <Label>Icon</Label>
+                                        <IconSelect
+                                            options={iconOptions}
+                                            value={
+                                                button.iconId ??
+                                                iconOptions[0]?.id ??
+                                                "fa:link"
+                                            }
+                                            onChange={(value) =>
+                                                updateButton(index, {
+                                                    iconId: value,
+                                                })
+                                            }
+                                        />
+                                    </div>
+                                ) : null}
 
-                        <div className="mt-4 grid gap-2">
-                            <label className="flex items-center gap-2 text-sm">
-                                <input
-                                    type="checkbox"
-                                    checked={button.useCustomStyle ?? false}
-                                    onChange={(event) =>
-                                        updateButton(index, {
-                                            useCustomStyle:
-                                                event.target.checked,
-                                        })
-                                    }
-                                />
-                                Custom colors
-                            </label>
-                        </div>
+                                <div className="mt-4 grid gap-2">
+                                    <label className="flex items-center gap-2 text-sm">
+                                        <input
+                                            type="checkbox"
+                                            checked={
+                                                button.useCustomStyle ?? false
+                                            }
+                                            onChange={(event) =>
+                                                updateButton(index, {
+                                                    useCustomStyle:
+                                                        event.target.checked,
+                                                })
+                                            }
+                                        />
+                                        Custom colors
+                                    </label>
+                                </div>
 
-                        {button.useCustomStyle ? (
-                            <div className="mt-4 grid gap-4 md:grid-cols-2">
-                                <div className="grid gap-2">
-                                    <Label>Border color</Label>
-                                    <ColorInput
-                                        value={
-                                            button.customStyle?.borderColor ??
-                                            "#ffffff"
-                                        }
-                                        onChange={(value) =>
-                                            updateButton(index, {
-                                                customStyle: {
-                                                    ...button.customStyle,
-                                                    borderColor: value,
-                                                },
-                                            })
-                                        }
-                                        placeholder="ffffff (empty = transparent)"
-                                    />
-                                </div>
-                                <div className="grid gap-2">
-                                    <Label>Text color</Label>
-                                    <ColorInput
-                                        value={
-                                            button.customStyle?.textColor ??
-                                            "#ffffff"
-                                        }
-                                        onChange={(value) =>
-                                            updateButton(index, {
-                                                customStyle: {
-                                                    ...button.customStyle,
-                                                    textColor: value,
-                                                },
-                                            })
-                                        }
-                                        placeholder="0f172a (empty = transparent)"
-                                    />
-                                </div>
-                                <div className="grid gap-2">
-                                    <Label>Background color</Label>
-                                    <ColorInput
-                                        value={
-                                            button.customStyle?.bgColor ??
-                                            "#000000"
-                                        }
-                                        onChange={(value) =>
-                                            updateButton(index, {
-                                                customStyle: {
-                                                    ...button.customStyle,
-                                                    bgColor: value,
-                                                },
-                                            })
-                                        }
-                                        placeholder="0b1020 (empty = transparent)"
-                                    />
-                                </div>
-                                <div className="grid gap-2">
-                                    <Label>Hover border</Label>
-                                    <ColorInput
-                                        value={
-                                            button.customStyle
-                                                ?.hoverBorderColor ?? "#ffffff"
-                                        }
-                                        onChange={(value) =>
-                                            updateButton(index, {
-                                                customStyle: {
-                                                    ...button.customStyle,
-                                                    hoverBorderColor: value,
-                                                },
-                                            })
-                                        }
-                                        placeholder="e2e8f0 (empty = transparent)"
-                                    />
-                                </div>
-                                <div className="grid gap-2">
-                                    <Label>Hover text</Label>
-                                    <ColorInput
-                                        value={
-                                            button.customStyle
-                                                ?.hoverTextColor ?? "#000000"
-                                        }
-                                        onChange={(value) =>
-                                            updateButton(index, {
-                                                customStyle: {
-                                                    ...button.customStyle,
-                                                    hoverTextColor: value,
-                                                },
-                                            })
-                                        }
-                                        placeholder="0b1020 (empty = transparent)"
-                                    />
-                                </div>
-                                <div className="grid gap-2">
-                                    <Label>Hover background</Label>
-                                    <ColorInput
-                                        value={
-                                            button.customStyle?.hoverBgColor ??
-                                            "#ffffff"
-                                        }
-                                        onChange={(value) =>
-                                            updateButton(index, {
-                                                customStyle: {
-                                                    ...button.customStyle,
-                                                    hoverBgColor: value,
-                                                },
-                                            })
-                                        }
-                                        placeholder="f8fafc (empty = transparent)"
-                                    />
-                                </div>
-                                <div className="grid gap-2">
-                                    <Label>Text align</Label>
-                                    <select
-                                        className="h-10 rounded-md border border-input bg-background px-3 text-sm"
-                                        value={
-                                            button.customStyle?.textAlign ??
-                                            "center"
-                                        }
-                                        onChange={(event) =>
-                                            updateButton(index, {
-                                                customStyle: {
-                                                    ...button.customStyle,
-                                                    textAlign: event.target
-                                                        .value as
-                                                        | "left"
-                                                        | "center"
-                                                        | "right",
-                                                },
-                                            })
+                                {button.useCustomStyle ? (
+                                    <div className="mt-4 grid gap-4 md:grid-cols-2">
+                                        <div className="grid gap-2">
+                                            <Label>Border color</Label>
+                                            <ColorInput
+                                                value={
+                                                    button.customStyle
+                                                        ?.borderColor ??
+                                                    "#ffffff"
+                                                }
+                                                onChange={(value) =>
+                                                    updateButton(index, {
+                                                        customStyle: {
+                                                            ...button.customStyle,
+                                                            borderColor: value,
+                                                        },
+                                                    })
+                                                }
+                                                placeholder="ffffff (empty = transparent)"
+                                            />
+                                        </div>
+                                        <div className="grid gap-2">
+                                            <Label>Text color</Label>
+                                            <ColorInput
+                                                value={
+                                                    button.customStyle
+                                                        ?.textColor ?? "#ffffff"
+                                                }
+                                                onChange={(value) =>
+                                                    updateButton(index, {
+                                                        customStyle: {
+                                                            ...button.customStyle,
+                                                            textColor: value,
+                                                        },
+                                                    })
+                                                }
+                                                placeholder="0f172a (empty = transparent)"
+                                            />
+                                        </div>
+                                        <div className="grid gap-2">
+                                            <Label>Background color</Label>
+                                            <ColorInput
+                                                value={
+                                                    button.customStyle?.bgColor ??
+                                                    "#000000"
+                                                }
+                                                onChange={(value) =>
+                                                    updateButton(index, {
+                                                        customStyle: {
+                                                            ...button.customStyle,
+                                                            bgColor: value,
+                                                        },
+                                                    })
+                                                }
+                                                placeholder="0b1020 (empty = transparent)"
+                                            />
+                                        </div>
+                                        <div className="grid gap-2">
+                                            <Label>Hover border</Label>
+                                            <ColorInput
+                                                value={
+                                                    button.customStyle
+                                                        ?.hoverBorderColor ??
+                                                    "#ffffff"
+                                                }
+                                                onChange={(value) =>
+                                                    updateButton(index, {
+                                                        customStyle: {
+                                                            ...button.customStyle,
+                                                            hoverBorderColor:
+                                                                value,
+                                                        },
+                                                    })
+                                                }
+                                                placeholder="e2e8f0 (empty = transparent)"
+                                            />
+                                        </div>
+                                        <div className="grid gap-2">
+                                            <Label>Hover text</Label>
+                                            <ColorInput
+                                                value={
+                                                    button.customStyle
+                                                        ?.hoverTextColor ??
+                                                    "#000000"
+                                                }
+                                                onChange={(value) =>
+                                                    updateButton(index, {
+                                                        customStyle: {
+                                                            ...button.customStyle,
+                                                            hoverTextColor: value,
+                                                        },
+                                                    })
+                                                }
+                                                placeholder="0b1020 (empty = transparent)"
+                                            />
+                                        </div>
+                                        <div className="grid gap-2">
+                                            <Label>Hover background</Label>
+                                            <ColorInput
+                                                value={
+                                                    button.customStyle
+                                                        ?.hoverBgColor ??
+                                                    "#ffffff"
+                                                }
+                                                onChange={(value) =>
+                                                    updateButton(index, {
+                                                        customStyle: {
+                                                            ...button.customStyle,
+                                                            hoverBgColor: value,
+                                                        },
+                                                    })
+                                                }
+                                                placeholder="f8fafc (empty = transparent)"
+                                            />
+                                        </div>
+                                        <div className="grid gap-2">
+                                            <Label>Text align</Label>
+                                            <select
+                                                className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+                                                value={
+                                                    button.customStyle?.textAlign ??
+                                                    "center"
+                                                }
+                                                onChange={(event) =>
+                                                    updateButton(index, {
+                                                        customStyle: {
+                                                            ...button.customStyle,
+                                                            textAlign: event.target
+                                                                .value as
+                                                                | "left"
+                                                                | "center"
+                                                                | "right",
+                                                        },
+                                                    })
+                                                }>
+                                                <option value="left">Left</option>
+                                                <option value="center">
+                                                    Center
+                                                </option>
+                                                <option value="right">Right</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                ) : null}
+
+                                <div className="mt-4 flex flex-wrap gap-2">
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => moveButton(index, -1)}
+                                        disabled={index === 0}>
+                                        Move up
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => moveButton(index, 1)}
+                                        disabled={
+                                            index === config.buttons.length - 1
                                         }>
-                                        <option value="left">Left</option>
-                                        <option value="center">Center</option>
-                                        <option value="right">Right</option>
-                                    </select>
+                                        Move down
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant="destructive"
+                                        size="sm"
+                                        onClick={() =>
+                                            updateButtons(
+                                                config.buttons.filter(
+                                                    (_, idx) => idx !== index,
+                                                ),
+                                            )
+                                        }>
+                                        Remove
+                                    </Button>
                                 </div>
-                            </div>
-                        ) : null}
-
-                        <div className="mt-4 flex flex-wrap gap-2">
-                            <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={() => moveButton(index, -1)}
-                                disabled={index === 0}>
-                                Move up
-                            </Button>
-                            <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={() => moveButton(index, 1)}
-                                disabled={index === config.buttons.length - 1}>
-                                Move down
-                            </Button>
-                            <Button
-                                type="button"
-                                variant="destructive"
-                                size="sm"
-                                onClick={() =>
-                                    updateButtons(
-                                        config.buttons.filter(
-                                            (_, idx) => idx !== index,
-                                        ),
-                                    )
-                                }>
-                                Remove
-                            </Button>
-                        </div>
-                    </div>
-                ))}
+                            </CollapsibleContent>
+                        </Collapsible>
+                    );
+                })}
                 {config.buttons.length === 0 ? (
                     <div className="text-sm text-muted-foreground">
                         No buttons yet. Add one to get started.
