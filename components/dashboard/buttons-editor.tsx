@@ -35,6 +35,9 @@ export function ButtonsEditor({
     ) => Promise<UploadResult>;
 }) {
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const [uploadProgress, setUploadProgress] = useState<
+        Record<string, number | null>
+    >({});
 
     const updateButtons = (buttons: ButtonItem[]) => {
         onChange({ ...config, buttons });
@@ -88,9 +91,35 @@ export function ButtonsEditor({
             return;
         }
 
-        const result = await onUpload(file, "media/buttons");
-        setErrors((prev) => ({ ...prev, [config.buttons[index].id]: "" }));
-        updateButton(index, { imageUrl: result.url, imagePath: result.path });
+        const buttonId = config.buttons[index].id;
+        setUploadProgress((prev) => ({ ...prev, [buttonId]: 0 }));
+        try {
+            const result = await onUpload(
+                file,
+                "media/buttons",
+                (progress) => {
+                    setUploadProgress((prev) => ({
+                        ...prev,
+                        [buttonId]: progress,
+                    }));
+                },
+            );
+            setErrors((prev) => ({ ...prev, [buttonId]: "" }));
+            updateButton(index, { imageUrl: result.url, imagePath: result.path });
+            setTimeout(
+                () =>
+                    setUploadProgress((prev) => ({
+                        ...prev,
+                        [buttonId]: null,
+                    })),
+                800,
+            );
+        } catch (error) {
+            const message =
+                error instanceof Error ? error.message : "Upload failed.";
+            setErrors((prev) => ({ ...prev, [buttonId]: message }));
+            setUploadProgress((prev) => ({ ...prev, [buttonId]: null }));
+        }
     };
 
     return (
@@ -194,11 +223,11 @@ export function ButtonsEditor({
                                                 className="h-16 w-24 rounded-lg object-cover"
                                             />
                                         ) : null}
-                                        {button.imageUrl ? (
-                                            <Button
-                                                type="button"
-                                                size="sm"
-                                                variant="outline"
+                                    {button.imageUrl ? (
+                                        <Button
+                                            type="button"
+                                            size="sm"
+                                            variant="outline"
                                                 onClick={() =>
                                                     updateButton(index, {
                                                         imageUrl: "",
@@ -209,6 +238,24 @@ export function ButtonsEditor({
                                             </Button>
                                         ) : null}
                                     </div>
+                                    {uploadProgress[button.id] !== null &&
+                                    uploadProgress[button.id] !==
+                                        undefined ? (
+                                        <div className="space-y-1">
+                                            <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                                                <div
+                                                    className="h-full rounded-full bg-foreground transition-all"
+                                                    style={{
+                                                        width: `${uploadProgress[button.id]}%`,
+                                                    }}
+                                                />
+                                            </div>
+                                            <p className="text-xs text-muted-foreground">
+                                                Uploading...{" "}
+                                                {uploadProgress[button.id]}%
+                                            </p>
+                                        </div>
+                                    ) : null}
                                     {errors[button.id] ? (
                                         <p className="text-sm text-destructive">
                                             {errors[button.id]}
