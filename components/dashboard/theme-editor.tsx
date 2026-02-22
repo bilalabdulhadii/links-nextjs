@@ -1,0 +1,368 @@
+"use client";
+
+import { useState } from "react";
+import { StyleEditor } from "@/components/dashboard/style-editor";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ColorInput } from "@/components/ui/color-input";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { defaultConfig, type AppConfig, type BackgroundConfig } from "@/lib/app-config";
+import type { UploadResult } from "@/lib/storage";
+
+const IMAGE_LIMIT_MB = 5;
+const VIDEO_LIMIT_MB = 30;
+
+const directions = [
+    "to bottom",
+    "to right",
+    "to bottom right",
+    "to top left",
+    "to bottom left",
+];
+
+export function ThemeEditor({
+    config,
+    onChange,
+    onUpload,
+}: {
+    config: AppConfig;
+    onChange: (next: AppConfig) => void;
+    onUpload: (
+        file: File,
+        folder: string,
+        onProgress?: (progress: number) => void,
+    ) => Promise<UploadResult>;
+}) {
+    const [error, setError] = useState<string | null>(null);
+
+    const updateTheme = (theme: AppConfig["theme"]) => {
+        onChange({ ...config, theme });
+    };
+
+    const updateBackground = (background: BackgroundConfig) => {
+        updateTheme({ ...config.theme, background });
+    };
+
+    const handleBackgroundType = (type: BackgroundConfig["type"]) => {
+        if (type === "solid") {
+            updateBackground({ type: "solid", color: "#0b1020" });
+        }
+        if (type === "gradient") {
+            updateBackground({
+                type: "gradient",
+                colors: ["#0b1020", "#16233a", "#1f3148"],
+                direction: "to bottom",
+            });
+        }
+        if (type === "image") {
+            updateBackground({ type: "image", url: "", path: "" });
+        }
+        if (type === "video") {
+            updateBackground({ type: "video", url: "", path: "" });
+        }
+    };
+
+    const handleImageUpload = async (file: File) => {
+        if (!file.type.startsWith("image/")) {
+            setError("Please upload an image file.");
+            return;
+        }
+        if (file.size > IMAGE_LIMIT_MB * 1024 * 1024) {
+            setError(`Image must be <= ${IMAGE_LIMIT_MB} MB.`);
+            return;
+        }
+        const result = await onUpload(file, "media/background");
+        setError(null);
+        updateBackground({ type: "image", url: result.url, path: result.path });
+    };
+
+    const handleVideoUpload = async (file: File) => {
+        if (!file.type.startsWith("video/")) {
+            setError("Please upload a video file.");
+            return;
+        }
+        if (file.size > VIDEO_LIMIT_MB * 1024 * 1024) {
+            setError(`Video must be <= ${VIDEO_LIMIT_MB} MB.`);
+            return;
+        }
+        const result = await onUpload(file, "media/background");
+        setError(null);
+        updateBackground({ type: "video", url: result.url, path: result.path });
+    };
+
+    const background = config.theme.background;
+
+    return (
+        <div id="theme" className="grid gap-6">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Background</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="grid gap-2">
+                        <Label>Type</Label>
+                        <select
+                            className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+                            value={background.type}
+                            onChange={(event) =>
+                                handleBackgroundType(
+                                    event.target
+                                        .value as BackgroundConfig["type"],
+                                )
+                            }>
+                            <option value="solid">Solid</option>
+                            <option value="gradient">Gradient</option>
+                            <option value="image">Image</option>
+                            <option value="video">Video</option>
+                        </select>
+                    </div>
+
+                    {background.type === "solid" ? (
+                        <div className="grid gap-2">
+                            <Label>Color</Label>
+                            <ColorInput
+                                value={background.color}
+                                onChange={(value) =>
+                                    updateBackground({
+                                        ...background,
+                                        color: value,
+                                    })
+                                }
+                                placeholder="0b1020 (empty = transparent)"
+                            />
+                        </div>
+                    ) : null}
+
+                    {background.type === "gradient" ? (
+                        <div className="grid gap-4 md:grid-cols-2">
+                            <div className="grid gap-2">
+                                <Label>Color 1</Label>
+                                <ColorInput
+                                    value={background.colors[0]}
+                                    onChange={(value) => {
+                                        const next = [...background.colors];
+                                        next[0] = value;
+                                        updateBackground({
+                                            ...background,
+                                            colors: next,
+                                        });
+                                    }}
+                                    placeholder="0b1020 (empty = transparent)"
+                                />
+                            </div>
+                            <div className="grid gap-2">
+                                <Label>Color 2</Label>
+                                <ColorInput
+                                    value={background.colors[1]}
+                                    onChange={(value) => {
+                                        const next = [...background.colors];
+                                        next[1] = value;
+                                        updateBackground({
+                                            ...background,
+                                            colors: next,
+                                        });
+                                    }}
+                                    placeholder="16233a (empty = transparent)"
+                                />
+                            </div>
+                            <div className="grid gap-2">
+                                <Label>Color 3 (optional)</Label>
+                                <ColorInput
+                                    value={background.colors[2] ?? "#1f3148"}
+                                    onChange={(value) => {
+                                        const next = [...background.colors];
+                                        next[2] = value;
+                                        updateBackground({
+                                            ...background,
+                                            colors: next,
+                                        });
+                                    }}
+                                    placeholder="1f3148 (empty = transparent)"
+                                />
+                            </div>
+                            <div className="grid gap-2">
+                                <Label>Direction</Label>
+                                <select
+                                    className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+                                    value={background.direction}
+                                    onChange={(event) =>
+                                        updateBackground({
+                                            ...background,
+                                            direction: event.target.value,
+                                        })
+                                    }>
+                                    {directions.map((direction) => (
+                                        <option
+                                            key={direction}
+                                            value={direction}>
+                                            {direction}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+                    ) : null}
+
+                    {background.type === "image" ? (
+                        <div className="grid gap-2">
+                            <Label>Background image</Label>
+                            <Input
+                                type="file"
+                                accept="image/*"
+                                onChange={(event) => {
+                                    const file = event.target.files?.[0];
+                                    if (file) {
+                                        void handleImageUpload(file);
+                                    }
+                                }}
+                            />
+                            {background.url ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img
+                                    src={background.url}
+                                    alt="Background"
+                                    className="h-32 w-full rounded-lg object-cover"
+                                />
+                            ) : null}
+                        </div>
+                    ) : null}
+
+                    {background.type === "video" ? (
+                        <div className="grid gap-2">
+                            <Label>Background video</Label>
+                            <Input
+                                type="file"
+                                accept="video/*"
+                                onChange={(event) => {
+                                    const file = event.target.files?.[0];
+                                    if (file) {
+                                        void handleVideoUpload(file);
+                                    }
+                                }}
+                            />
+                            {background.url ? (
+                                <video
+                                    src={background.url}
+                                    className="h-32 w-full rounded-lg object-cover"
+                                    muted
+                                    playsInline
+                                />
+                            ) : null}
+                        </div>
+                    ) : null}
+
+                    {error ? (
+                        <p className="text-sm text-destructive">{error}</p>
+                    ) : null}
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Icon Style</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <StyleEditor
+                        style={config.theme.iconStyle}
+                        onChange={(iconStyle) =>
+                            updateTheme({ ...config.theme, iconStyle })
+                        }
+                    />
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Button Style</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <StyleEditor
+                        style={config.theme.buttonStyle}
+                        onChange={(buttonStyle) =>
+                            updateTheme({ ...config.theme, buttonStyle })
+                        }
+                    />
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Text Color</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="grid gap-2">
+                        <Label>Title, description, modal, footer</Label>
+                        <ColorInput
+                            value={config.theme.textColor ?? ""}
+                            onChange={(value) =>
+                                updateTheme({
+                                    ...config.theme,
+                                    textColor: value,
+                                })
+                            }
+                            placeholder="0f172a (empty = transparent)"
+                        />
+                    </div>
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Hover Animation</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="grid gap-4">
+                        <Label>Buttons, icons, share button</Label>
+                        <select
+                            className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+                            value={config.theme.hoverAnimation}
+                            onChange={(event) =>
+                                updateTheme({
+                                    ...config.theme,
+                                    hoverAnimation: event.target
+                                        .value as AppConfig["theme"]["hoverAnimation"],
+                                })
+                            }>
+                            <option value="none">None</option>
+                            <option value="lift">Lift (smooth)</option>
+                            <option value="float">Float</option>
+                            <option value="pulse">Pulse</option>
+                            <option value="pop">Pop</option>
+                        </select>
+                        <div className="grid gap-2">
+                            <Label>Transition time (ms)</Label>
+                            <Input
+                                type="number"
+                                min={80}
+                                max={1200}
+                                step={20}
+                                value={config.theme.hoverTransitionMs ?? 0}
+                                onChange={(event) => {
+                                    const raw = event.target.value;
+                                    const next =
+                                        raw === ""
+                                            ? defaultConfig.theme
+                                                  .hoverTransitionMs
+                                            : Number(raw);
+                                    updateTheme({
+                                        ...config.theme,
+                                        hoverTransitionMs:
+                                            Number.isFinite(next) &&
+                                            next >= 0
+                                                ? next
+                                                : defaultConfig.theme
+                                                      .hoverTransitionMs,
+                                    });
+                                }}
+                            />
+                            <p className="text-xs text-muted-foreground">
+                                Set how fast hover animations and transitions
+                                feel.
+                            </p>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+    );
+}
