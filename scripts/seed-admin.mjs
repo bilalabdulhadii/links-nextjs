@@ -7,35 +7,37 @@ import { getFirestore } from "firebase-admin/firestore";
 dotenv.config({ path: ".env.local" });
 
 const {
-    FIREBASE_ADMIN_PROJECT_ID,
-    FIREBASE_ADMIN_CLIENT_EMAIL,
-    FIREBASE_ADMIN_PRIVATE_KEY,
-    SEED_ADMIN_EMAIL,
-    SEED_ADMIN_PASSWORD,
+    LINKS_FIREBASE_ADMIN_PROJECT_ID,
+    LINKS_FIREBASE_ADMIN_CLIENT_EMAIL,
+    LINKS_FIREBASE_ADMIN_PRIVATE_KEY,
+    LINKS_SEED_ADMIN_EMAIL,
+    LINKS_SEED_ADMIN_PASSWORD,
 } = process.env;
 
 if (
-    !FIREBASE_ADMIN_PROJECT_ID ||
-    !FIREBASE_ADMIN_CLIENT_EMAIL ||
-    !FIREBASE_ADMIN_PRIVATE_KEY
+    !LINKS_FIREBASE_ADMIN_PROJECT_ID ||
+    !LINKS_FIREBASE_ADMIN_CLIENT_EMAIL ||
+    !LINKS_FIREBASE_ADMIN_PRIVATE_KEY
 ) {
     console.error("Missing Firebase Admin credentials in .env.local.");
     process.exit(1);
 }
 
-if (!SEED_ADMIN_EMAIL || !SEED_ADMIN_PASSWORD) {
-    console.error("Missing SEED_ADMIN_EMAIL or SEED_ADMIN_PASSWORD.");
+if (!LINKS_SEED_ADMIN_EMAIL || !LINKS_SEED_ADMIN_PASSWORD) {
+    console.error(
+        "Missing LINKS_SEED_ADMIN_EMAIL or LINKS_SEED_ADMIN_PASSWORD.",
+    );
     process.exit(1);
 }
 
-const privateKey = FIREBASE_ADMIN_PRIVATE_KEY.replace(/\\n/g, "\n");
+const privateKey = LINKS_FIREBASE_ADMIN_PRIVATE_KEY.replace(/\\n/g, "\n");
 
 const app = getApps().length
     ? getApps()[0]
     : initializeApp({
           credential: cert({
-              projectId: FIREBASE_ADMIN_PROJECT_ID,
-              clientEmail: FIREBASE_ADMIN_CLIENT_EMAIL,
+              projectId: LINKS_FIREBASE_ADMIN_PROJECT_ID,
+              clientEmail: LINKS_FIREBASE_ADMIN_CLIENT_EMAIL,
               privateKey,
           }),
       });
@@ -46,12 +48,12 @@ const firestore = getFirestore(app);
 async function main() {
     let user;
     try {
-        user = await auth.getUserByEmail(SEED_ADMIN_EMAIL);
+        user = await auth.getUserByEmail(LINKS_SEED_ADMIN_EMAIL);
         console.log(`Admin already exists: ${user.uid}`);
     } catch {
         user = await auth.createUser({
-            email: SEED_ADMIN_EMAIL,
-            password: SEED_ADMIN_PASSWORD,
+            email: LINKS_SEED_ADMIN_EMAIL,
+            password: LINKS_SEED_ADMIN_PASSWORD,
             emailVerified: true,
         });
         await auth.setCustomUserClaims(user.uid, { role: "admin" });
