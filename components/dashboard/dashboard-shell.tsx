@@ -35,7 +35,7 @@ import {
     type UploadResult,
 } from "@/lib/storage";
 import { cn } from "@/lib/utils";
-import { Command, Eye, Save, X, Search } from "lucide-react";
+import { Command, Eye, Save, X, Search, CheckCircle2, XCircle } from "lucide-react";
 import {
     Tooltip,
     TooltipContent,
@@ -82,6 +82,13 @@ type DashboardContextValue = {
     clearButtonStyleBackupDraft: () => void;
 };
 
+type ToastItem = {
+    id: string;
+    title: string;
+    description?: string;
+    variant: "success" | "error";
+};
+
 const DashboardContext = createContext<DashboardContextValue | null>(null);
 
 export function useDashboard() {
@@ -118,6 +125,8 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     const [helpOpen, setHelpOpen] = useState(false);
     const [jumpOpen, setJumpOpen] = useState(false);
     const [stylePanelOpen, setStylePanelOpen] = useState(false);
+    const [toasts, setToasts] = useState<ToastItem[]>([]);
+    const toastTimers = useRef<Map<string, number>>(new Map());
 
     useEffect(() => {
         pendingRef.current = pendingPaths;
@@ -131,6 +140,81 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             document.body.classList.remove("overflow-hidden");
         };
     }, []);
+
+    useEffect(() => {
+        const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+            if (!isDirty) {
+                return;
+            }
+            event.preventDefault();
+            event.returnValue = "";
+        };
+        window.addEventListener("beforeunload", handleBeforeUnload);
+        return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+    }, [isDirty]);
+
+    useEffect(() => {
+        const handleClick = (event: MouseEvent) => {
+            if (!isDirty) {
+                return;
+            }
+            const target = event.target as HTMLElement | null;
+            const anchor = target?.closest("a");
+            if (!anchor) {
+                return;
+            }
+            const href = anchor.getAttribute("href");
+            if (!href || href.startsWith("#")) {
+                return;
+            }
+            if (anchor.target === "_blank") {
+                return;
+            }
+            if (href.startsWith("/dashboard")) {
+                return;
+            }
+            const ok = window.confirm(
+                "You have unsaved changes. Leave without saving?",
+            );
+            if (!ok) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+        };
+        document.addEventListener("click", handleClick, true);
+        return () => document.removeEventListener("click", handleClick, true);
+    }, [isDirty]);
+
+    useEffect(() => {
+        return () => {
+            toastTimers.current.forEach((timerId) =>
+                window.clearTimeout(timerId),
+            );
+            toastTimers.current.clear();
+        };
+    }, []);
+
+    const removeToast = (id: string) => {
+        setToasts((prev) => prev.filter((item) => item.id !== id));
+        const timerId = toastTimers.current.get(id);
+        if (timerId) {
+            window.clearTimeout(timerId);
+            toastTimers.current.delete(id);
+        }
+    };
+
+    const pushToast = (toast: Omit<ToastItem, "id">) => {
+        const id =
+            typeof crypto !== "undefined" && "randomUUID" in crypto
+                ? crypto.randomUUID()
+                : `${Date.now()}-${Math.random()}`;
+        const nextToast: ToastItem = { ...toast, id };
+        setToasts((prev) => [...prev, nextToast]);
+        const timerId = window.setTimeout(() => {
+            removeToast(id);
+        }, 3600);
+        toastTimers.current.set(id, timerId);
+    };
 
     useEffect(() => {
         return () => {
@@ -165,11 +249,27 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         folder: string,
         onProgress?: (progress: number) => void,
     ): Promise<UploadResult> => {
-        const result = await uploadMediaFile(file, folder, { onProgress });
-        setPendingPaths((prev) =>
-            prev.includes(result.path) ? prev : [...prev, result.path],
-        );
-        return result;
+        try {
+            const result = await uploadMediaFile(file, folder, { onProgress });
+            setPendingPaths((prev) =>
+                prev.includes(result.path) ? prev : [...prev, result.path],
+            );
+            pushToast({
+                variant: "success",
+                title: "Upload complete",
+                description: file.name,
+            });
+            return result;
+        } catch (err) {
+            const message =
+                err instanceof Error ? err.message : "Upload failed";
+            pushToast({
+                variant: "error",
+                title: "Upload failed",
+                description: message,
+            });
+            throw err;
+        }
     };
 
     const onChange = (next: AppConfig) => {
@@ -214,10 +314,16 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             setButtonStyleBackupDraft(null);
             setStatus("Changes saved.");
             setSaveSignal((prev) => prev + 1);
+            pushToast({ variant: "success", title: "Changes saved" });
         } catch (err) {
             const message =
                 err instanceof Error ? err.message : "Failed to save";
             setStatus(message);
+            pushToast({
+                variant: "error",
+                title: "Save failed",
+                description: message,
+            });
         } finally {
             setSaving(false);
         }
@@ -250,10 +356,16 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             setButtonStyleBackupDraft(null);
             setStatus("Changes saved.");
             setSaveSignal((prev) => prev + 1);
+            pushToast({ variant: "success", title: "Changes saved" });
         } catch (err) {
             const message =
                 err instanceof Error ? err.message : "Failed to reset";
             setStatus(message);
+            pushToast({
+                variant: "error",
+                title: "Reset failed",
+                description: message,
+            });
         } finally {
             setSaving(false);
         }
@@ -415,20 +527,31 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                             />
                             <Button
                                 variant="link"
-                                className="text-muted-foreground !px-0 font-normal hover:no-underline cursor-pointer"
+                                className="text-muted-foreground !px-0 text-xs font-normal hover:no-underline cursor-pointer"
                                 onClick={() => setJumpOpen(true)}>
                                 <Search className="size-4" />
-                                Search
-                                <kbd className="bg-muted inline-flex h-5 items-center gap-1 rounded border px-1.5 text-[10px] font-medium select-none">
+                                <span className="hidden md:inline">Search</span>
+                                <kbd className="bg-muted hidden h-5 items-center gap-1 rounded border px-1.5 text-[10px] font-medium select-none lg:inline-flex">
                                     <span className="text-xs">⌘</span>K
                                 </kbd>
                             </Button>
                             {/* <h1 className="text-base font-medium">Dashboard</h1> */}
                         </div>
                         <TooltipProvider>
-                            <div className="mr-4 flex items-center gap-3">
+                            <div className="mr-4 flex items-center gap-2">
+                                <span
+                                    className={cn(
+                                        "hidden rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide md:inline-flex",
+                                        draft.published
+                                            ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-200"
+                                            : "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-200",
+                                    )}>
+                                    {draft.published
+                                        ? "Published"
+                                        : "Unpublished"}
+                                </span>
                                 {status ? (
-                                    <span className="text-xs text-muted-foreground">
+                                    <span className="hidden text-xs text-muted-foreground md:inline">
                                         {status}
                                     </span>
                                 ) : null}
@@ -437,10 +560,14 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                                         <Button
                                             type="button"
                                             variant="outline"
+                                            size="sm"
+                                            className="h-7 px-2 text-[11px] gap-1"
                                             onClick={onCancel}
                                             disabled={saving || !isDirty}>
                                             <X className="h-4 w-4" />
-                                            Cancel
+                                            <span className="hidden sm:inline">
+                                                Cancel
+                                            </span>
                                         </Button>
                                     </TooltipTrigger>
                                     <TooltipContent side="bottom">
@@ -456,15 +583,18 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                                     <TooltipTrigger asChild>
                                         <Button
                                             type="button"
+                                            size="sm"
                                             onClick={() =>
                                                 router.push(
                                                     "/dashboard/preview",
                                                 )
                                             }
                                             disabled={!isDirty}
-                                            className="gap-2 bg-blue-600 text-white border border-blue-600 hover:bg-blue-700 hover:border-blue-700 transition-colors disabled:bg-blue-300 disabled:border-blue-300 disabled:cursor-not-allowed">
-                                            <Eye className="h-4 w-4" />
-                                            Preview
+                                            className="h-7 gap-1 bg-blue-600 px-2 text-[11px] text-white border border-blue-600 hover:bg-blue-700 hover:border-blue-700 transition-colors disabled:bg-blue-300 disabled:border-blue-300 disabled:cursor-not-allowed">
+                                            <Eye className="h-3.5 w-3.5" />
+                                            <span className="hidden sm:inline">
+                                                Preview
+                                            </span>
                                         </Button>
                                     </TooltipTrigger>
                                     <TooltipContent side="bottom">
@@ -480,12 +610,16 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                                     <TooltipTrigger asChild>
                                         <Button
                                             type="button"
+                                            size="sm"
+                                            className="h-7 px-2 text-[11px] gap-1"
                                             onClick={onSave}
                                             disabled={saving || !isDirty}>
-                                            <Save className="h-4 w-4" />
-                                            {saving && isDirty
-                                                ? "Saving..."
-                                                : "Save"}
+                                            <Save className="h-3.5 w-3.5" />
+                                            <span className="hidden sm:inline">
+                                                {saving && isDirty
+                                                    ? "Saving..."
+                                                    : "Save"}
+                                            </span>
                                         </Button>
                                     </TooltipTrigger>
                                     <TooltipContent side="bottom">
@@ -536,6 +670,42 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                     </div>
                 </DialogContent>
             </Dialog>
+            <div className="fixed right-6 top-20 z-50 flex w-80 max-w-[calc(100vw-2rem)] flex-col gap-3">
+                {toasts.map((toast) => (
+                    <div
+                        key={toast.id}
+                        className={cn(
+                            "flex items-start gap-3 rounded-xl border px-4 py-3 shadow-lg backdrop-blur",
+                            toast.variant === "success"
+                                ? "border-emerald-200/60 bg-emerald-50/95 text-emerald-900 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-100"
+                                : "border-rose-200/60 bg-rose-50/95 text-rose-900 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-100",
+                        )}>
+                        <div className="mt-0.5">
+                            {toast.variant === "success" ? (
+                                <CheckCircle2 className="h-4 w-4" />
+                            ) : (
+                                <XCircle className="h-4 w-4" />
+                            )}
+                        </div>
+                        <div className="flex-1">
+                            <p className="text-sm font-medium">
+                                {toast.title}
+                            </p>
+                            {toast.description ? (
+                                <p className="text-xs text-muted-foreground">
+                                    {toast.description}
+                                </p>
+                            ) : null}
+                        </div>
+                        <button
+                            type="button"
+                            className="text-xs text-muted-foreground hover:text-foreground"
+                            onClick={() => removeToast(toast.id)}>
+                            Dismiss
+                        </button>
+                    </div>
+                ))}
+            </div>
             <HelpDialog open={helpOpen} onOpenChange={setHelpOpen} />
             <JumpCommand open={jumpOpen} onOpenChange={setJumpOpen} />
         </DashboardContext.Provider>
