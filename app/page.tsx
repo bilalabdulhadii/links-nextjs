@@ -7,7 +7,7 @@ import { useAppConfig } from "@/hooks/use-app-config";
 import { useAuth } from "@/hooks/use-auth";
 import { LoadingState } from "@/components/home/loading-state";
 import { ShareModal } from "@/components/home/share-modal";
-import { TryAgainState } from "@/components/home/try-again-state";
+import { StatusState } from "@/components/home/status-state";
 import { UnpublishedState } from "@/components/home/unpublished-state";
 import { HomeView } from "@/components/home/home-view";
 import { HomeFooter } from "@/components/home/home-footer";
@@ -44,15 +44,44 @@ export default function Home() {
         return <LoadingState theme={activeTheme} textColor={textColor} />;
     }
 
-    if (error || !config) {
+    if (error) {
         if (!showFallback) {
             return <LoadingState theme={activeTheme} textColor={textColor} />;
         }
         return (
-            <TryAgainState
+            <StatusState
                 theme={activeTheme}
                 textColor={textColor}
-                onRetry={() => window.location.reload()}
+                badge="Offline"
+                title="We couldn't reach your Links"
+                description="Check your connection and try again. If this keeps happening, reach out and we'll help."
+                primaryAction={{
+                    label: "Try again",
+                    onClick: () => window.location.reload(),
+                }}
+                secondaryAction={{
+                    label: "Contact support",
+                    href: "mailto:bilalabdulhadi88@gmail.com",
+                }}
+            />
+        );
+    }
+
+    if (!config) {
+        if (!showFallback) {
+            return <LoadingState theme={activeTheme} textColor={textColor} />;
+        }
+        return (
+            <StatusState
+                theme={activeTheme}
+                textColor={textColor}
+                badge="Setup needed"
+                title="Your Links page is ready to publish"
+                description="Open the dashboard to finish setup and publish your first page."
+                secondaryAction={{
+                    label: "Try again",
+                    onClick: () => window.location.reload(),
+                }}
             />
         );
     }
