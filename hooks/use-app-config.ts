@@ -39,9 +39,13 @@ export function useAppConfig(options?: { autoCreate?: boolean }) {
                         });
                     }
                     setConfig(autoCreate ? defaultConfig : null);
+                    if (!autoCreate) {
+                        setError("Config not found.");
+                    }
                 } else {
                     const data = snapshot.data() as Partial<AppConfig>;
                     setConfig(mergeAppConfig(data));
+                    setError(null);
                 }
                 setLoading(false);
             },

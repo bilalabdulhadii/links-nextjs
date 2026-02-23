@@ -75,10 +75,10 @@ export default function Home() {
             <StatusState
                 theme={activeTheme}
                 textColor={textColor}
-                badge="Setup needed"
-                title="Your Links page is ready to publish"
-                description="Open the dashboard to finish setup and publish your first page."
-                secondaryAction={{
+                badge="Config missing"
+                title="We couldn't load your Links config"
+                description="Check your Firebase project ID, rules, or seed script and try again."
+                primaryAction={{
                     label: "Try again",
                     onClick: () => window.location.reload(),
                 }}

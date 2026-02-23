@@ -14,30 +14,30 @@ const {
     LINKS_SEED_ADMIN_PASSWORD,
 } = process.env;
 
-if (
-    !LINKS_FIREBASE_ADMIN_PROJECT_ID ||
-    !LINKS_FIREBASE_ADMIN_CLIENT_EMAIL ||
-    !LINKS_FIREBASE_ADMIN_PRIVATE_KEY
-) {
+const adminProjectId = LINKS_FIREBASE_ADMIN_PROJECT_ID;
+const adminClientEmail = LINKS_FIREBASE_ADMIN_CLIENT_EMAIL;
+const adminPrivateKey = LINKS_FIREBASE_ADMIN_PRIVATE_KEY;
+const seedEmail = LINKS_SEED_ADMIN_EMAIL;
+const seedPassword = LINKS_SEED_ADMIN_PASSWORD;
+
+if (!adminProjectId || !adminClientEmail || !adminPrivateKey) {
     console.error("Missing Firebase Admin credentials in .env.local.");
     process.exit(1);
 }
 
-if (!LINKS_SEED_ADMIN_EMAIL || !LINKS_SEED_ADMIN_PASSWORD) {
-    console.error(
-        "Missing LINKS_SEED_ADMIN_EMAIL or LINKS_SEED_ADMIN_PASSWORD.",
-    );
+if (!seedEmail || !seedPassword) {
+    console.error("Missing SEED_ADMIN_EMAIL or SEED_ADMIN_PASSWORD.");
     process.exit(1);
 }
 
-const privateKey = LINKS_FIREBASE_ADMIN_PRIVATE_KEY.replace(/\\n/g, "\n");
+const privateKey = adminPrivateKey.replace(/\\n/g, "\n");
 
 const app = getApps().length
     ? getApps()[0]
     : initializeApp({
           credential: cert({
-              projectId: LINKS_FIREBASE_ADMIN_PROJECT_ID,
-              clientEmail: LINKS_FIREBASE_ADMIN_CLIENT_EMAIL,
+              projectId: adminProjectId,
+              clientEmail: adminClientEmail,
               privateKey,
           }),
       });
@@ -48,12 +48,12 @@ const firestore = getFirestore(app);
 async function main() {
     let user;
     try {
-        user = await auth.getUserByEmail(LINKS_SEED_ADMIN_EMAIL);
+        user = await auth.getUserByEmail(seedEmail);
         console.log(`Admin already exists: ${user.uid}`);
     } catch {
         user = await auth.createUser({
-            email: LINKS_SEED_ADMIN_EMAIL,
-            password: LINKS_SEED_ADMIN_PASSWORD,
+            email: seedEmail,
+            password: seedPassword,
             emailVerified: true,
         });
         await auth.setCustomUserClaims(user.uid, { role: "admin" });
