@@ -363,9 +363,11 @@ export function mergeAppConfig(
     if ("animation" in restTheme) {
         delete restTheme.animation;
     }
-    const hoverTransitionMs = Number.isFinite(restTheme.hoverTransitionMs)
-        ? restTheme.hoverTransitionMs
-        : defaultConfig.theme.hoverTransitionMs;
+    const hoverTransitionMs =
+        typeof restTheme.hoverTransitionMs === "number" &&
+        Number.isFinite(restTheme.hoverTransitionMs)
+            ? Math.max(0, restTheme.hoverTransitionMs)
+            : defaultConfig.theme.hoverTransitionMs;
     const hoverAnimation = (
         ["none", "lift", "float", "pulse", "pop"] as const
     ).includes(restTheme.hoverAnimation as ThemeConfig["hoverAnimation"])
