@@ -1,8 +1,8 @@
 {
-    "siteTitle": "Links",
+    "siteTitle": "Links Lab",
     "profileTitle": "Digital Profile",
     "description": "Links • Projects • Socials",
-    "published": true,
+    "published": false,
     "unpublishMode": "coming-soon",
     "unpublishTitle": "We'll be right back",
     "unpublishDescription": "We're preparing this page for you. Please check back shortly.",
@@ -76,8 +76,8 @@
             "id": "btn-store",
             "layout": "card",
             "eyebrow": "Featured",
-            "label": "Featured Project",
-            "url": "https://example.com",
+            "label": "Featured Projects",
+            "url": "https://apps.bilalabdulhadi.com",
             "imageUrl": "/images/preview.jpg",
             "useCustomStyle": true,
             "customStyle": {
